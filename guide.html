@@ -29,6 +29,10 @@
 .steps > li { position: relative; min-width: 0; padding-left: 2.75rem; counter-increment: step; }
 .steps > li::before { content: counter(step); position: absolute; left: 0; top: .05rem; display: grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: var(--sea); color: #fff; font-size: .875rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
 .plain { display: grid; gap: .5rem; margin: 0; padding-left: 1.25rem; }
+.shot { margin: 1.5rem 0; }
+.shot img { width: 100%; height: auto; border: 1px solid rgba(5, 42, 51, .2); background: #f2f2f2; }
+.shot.small img { width: auto; max-width: min(100%, 26rem); }
+.shot figcaption { margin-top: .5rem; font-size: .95rem; color: var(--muted); }
 .why { padding: 0 1.25rem; border-left: 5px solid var(--sand); background: var(--paper); }
 .why summary { padding: .9rem 0; cursor: pointer; font-weight: 700; }
 .why summary:hover { color: var(--sea); }
@@ -101,8 +105,9 @@
 <h2><small>Every now and then</small>Signing in</h2>
 <ol class="steps">
 <li>Open the editor.</li>
-<li>Click <strong>Sign In with GitHub</strong>.</li>
-<li>The first time only, a small GitHub window asks you to authorize the editor. Click the green <strong>Authorize</strong> button.</li>
+<li>Click <strong>Sign In with GitHub</strong>. Ignore the other button; that one is for Kevin.
+<figure class="shot small"><img src="guide/sign-in-buttons.jpg" width="370" height="115" loading="lazy" alt="Two buttons: Sign In with GitHub, and below it Sign In Using Access Token."><figcaption>Use the top one.</figcaption></figure></li>
+<li>The first time only, a small GitHub window asks you to authorize <strong>Crabbe Construction Editor</strong>. That is the right one: the editor is named after the first website Kevin built this way. Click the green <strong>Authorize</strong> button.</li>
 <li>The editor opens. You stay signed in on that computer or phone, so most days you skip straight to editing.</li>
 </ol>
 <details class="why">
@@ -119,9 +124,10 @@
 <li><strong>Press</strong>: one entry per article or film about the club.</li>
 <li><strong>Extra pages</strong>: any page you add yourselves, such as "Our Sponsors".</li>
 <li><strong>Main pages</strong>: four forms, one each for the home page, About, Donate and Contact. The home page form also holds the details shown everywhere: the email address, the Instagram name, the nonprofit statement and the Tax ID.</li>
-<li>The <strong>New</strong> button adds an entry to whichever list you are in.</li>
-<li>The <strong>photo library</strong> holds every photo on the site in one place.</li>
+<li>The <strong>New</strong> button, at the top right, adds an entry to whichever list you are in.</li>
+<li>The small picture icon at the top left opens the <strong>photo library</strong>: every photo on the site in one place. The editor calls it Assets. The icon beside it brings the lists back.</li>
 </ul>
+<figure class="shot"><img src="guide/editor-home.jpg" width="800" height="640" loading="lazy" alt="The editor with the Team list open. On the left are the four lists: Team, Press, Extra pages and Main pages. A blue New button is at the top right."><figcaption>The editor, with the Team list open. The four lists are on the left and New is at the top right.</figcaption></figure>
 <details class="why">
 <summary>Where do these lists come from?</summary>
 <p>Each team member and each press mention is one small text file in the website's folder. The editor reads those files and shows them as lists. When you fill in a form and save, the editor writes the file for you.</p>
@@ -132,12 +138,13 @@
 <h2><small>Board, volunteers, anyone you want to introduce</small>Add someone to the team page</h2>
 <ol class="steps">
 <li>Click <strong>Team</strong>, then <strong>New</strong>.</li>
-<li>Fill in their <strong>Name</strong>.</li>
+<li>Fill in their <strong>Name</strong>. A red star beside a box's name means it has to be filled in.</li>
 <li>Fill in their <strong>Role</strong>, for example "Volunteer surf instructor". This box is optional.</li>
-<li>Add a <strong>Photo</strong> if you have one. A portrait works best. It is shown in a white frame, like a print.</li>
+<li>Add a <strong>Photo</strong> if you have one: click <strong>Browse</strong> and pick it, or drag it onto the grey box. A portrait works best. It is shown in a white frame, like a print.
+<figure class="shot"><img src="guide/team-new.jpg" width="800" height="640" loading="lazy" alt="A blank team member form with boxes for Name, Role, Photo and About them, and a Save button at the top right."><figcaption>A new team member. Save is at the top right.</figcaption></figure></li>
 <li>Write a sentence or two in <strong>About them</strong>.</li>
 <li>Set <strong>Position</strong>: lower numbers show first. People with the same number are listed by name.</li>
-<li>Click <strong>Save</strong> and wait for the "Entry saved." message.</li>
+<li>Click <strong>Save</strong> at the top right. The editor goes back to the list of people.</li>
 <li>Give it a minute, then open the site and look.</li>
 </ol>
 <p>The Team link appears in the menu as soon as there is one person on the page, and goes away if there are none.</p>
@@ -157,8 +164,9 @@
 <li>Click <strong>Press</strong>, then <strong>New</strong>.</li>
 <li>Type the <strong>Headline</strong> exactly as it was published.</li>
 <li>Fill in <strong>Published by</strong>, for example "Monterey County NOW".</li>
-<li>Pick the <strong>Date published</strong>.</li>
-<li>Choose the <strong>Type</strong>: Article or Film. It decides whether the button says "Read the article" or "Watch the film".</li>
+<li>Pick the <strong>Date published</strong>: click the little calendar, or <strong>Today</strong>.</li>
+<li>Choose the <strong>Type</strong>: Article or Film. It decides whether the button says "Read the article" or "Watch the film".
+<figure class="shot"><img src="guide/press-new.jpg" width="800" height="640" loading="lazy" alt="A blank press mention form with boxes for Headline, Published by, Date published with a Today button, Type with Article and Film, and Link."><figcaption>A new press mention.</figcaption></figure></li>
 <li>Paste the <strong>Link</strong>. Copy it from the address bar of the article or video. It has to start with https://.</li>
 <li>Write a <strong>One-line description</strong> in your own words.</li>
 <li>Click <strong>Save</strong>.</li>
@@ -173,15 +181,18 @@
 <section id="home">
 <h2><small>Home, About and Contact</small>Change the words on a page</h2>
 <ol class="steps">
-<li>Click <strong>Main pages</strong>, then the page you want: <strong>Home page and site details</strong>, <strong>About page</strong> or <strong>Contact page</strong>.</li>
+<li>Click <strong>Main pages</strong>, then the page you want: <strong>Home page and site details</strong>, <strong>About page</strong> or <strong>Contact page</strong>.
+<figure class="shot"><img src="guide/main-pages.jpg" width="800" height="360" loading="lazy" alt="The Main pages list, with four forms: Home page and site details, About page, Donate page and Contact page."><figcaption>The four main pages.</figcaption></figure></li>
 <li>Change what you need. Each box is labelled with where it shows on the page.</li>
 <li>In a large text box, leave a blank line to start a new paragraph.</li>
-<li>Click <strong>Save</strong>.</li>
+<li>Click <strong>Save</strong>. It is grey until you change something.</li>
 </ol>
+<figure class="shot"><img src="guide/home-form.jpg" width="800" height="640" loading="lazy" alt="Part of the home page form, showing the Tax ID box, the Big words at the top box holding Surf, Connect and Belong on three lines, and the line under them."><figcaption>Part of the home page form. The three big words are one per line.</figcaption></figure>
 <ul class="plain">
 <li><strong>Big words at the top</strong> are the three huge words on the home page. Put one word or short phrase on each line.</li>
 <li><strong>Photo behind the big words</strong> is optional. Without one the top of the page is plain blue.</li>
-<li><strong>Quick facts</strong> and <strong>Steps of a surf day</strong> are lists. Each has its own add and remove buttons. Remove every step and that section leaves the page.</li>
+<li><strong>Quick facts</strong> and <strong>Steps of a surf day</strong> are lists. Each item is its own small numbered form. <strong>Add Fact</strong> and <strong>Add Step</strong> add one. Point at an item's grey bar and buttons appear at its right end: the arrows move it up or down, and the ✕ removes it. Remove every step and that section leaves the page.
+<figure class="shot"><img src="guide/list-buttons.jpg" width="800" height="80" loading="lazy" alt="The grey bar of item 1 in the Quick facts list, with an up arrow, a down arrow, three dots and an X at its right end."><figcaption>The buttons that appear when you point at an item's bar.</figcaption></figure></li>
 <li>The <strong>Email address</strong> and <strong>Instagram user name</strong> are used on every page and on Contact, so you only change them once.</li>
 </ul>
 </section>
@@ -191,13 +202,14 @@
 <p>The Donate page shows the club's Zeffy form right on the page, with Venmo and Zelle buttons beside it. The links behind them decide where donations go, so they are checked twice.</p>
 <ol class="steps">
 <li>Click <strong>Main pages</strong>, then <strong>Donate page</strong>.</li>
-<li>To change a link, paste the new one in its box: <strong>Zeffy donation form</strong>, <strong>Venmo link</strong> or <strong>Zelle link</strong>.</li>
+<li>To change a link, paste the new one in its box: <strong>Zeffy donation form</strong>, <strong>Venmo link</strong> or <strong>Zelle link</strong>.
+<figure class="shot"><img src="guide/donate-form.jpg" width="800" height="640" loading="lazy" alt="The Donate page form, showing the page title, the opening line, the Zeffy donation form box holding an address on zeffy.com, and the note under the form."><figcaption>The Donate page form. The Venmo and Zelle boxes are further down.</figcaption></figure></li>
 <li>Click <strong>Save</strong>.</li>
 <li>Give it a minute, open the Donate page on the real site, and click each button to make sure it lands on the club's own account.</li>
 </ol>
 <details class="why">
 <summary>Why does the editor refuse some links?</summary>
-<p>Each box only accepts an address on the service it is named for: zeffy.com, venmo.com, or Zelle's own site. A typo or a pasted link to somewhere else is turned away, and the website will not show a donation button that points anywhere else.</p>
+<p>Each box only accepts an address on the service it is named for: zeffy.com, venmo.com, or Zelle's own site. A typo or a pasted link to somewhere else gets a red message when you press Save, and nothing is saved. The website will not show a donation button that points anywhere else.</p>
 </details>
 <details class="why">
 <summary>Who sends the tax receipts?</summary>
@@ -212,7 +224,7 @@
 <li>Click <strong>Extra pages</strong>, then <strong>New</strong>.</li>
 <li>Give it a <strong>Page title</strong>. The page's address and its link in the menu come from this.</li>
 <li>Leave <strong>Show in the menu</strong> switched on if it should have a link at the top of the site.</li>
-<li>Write the <strong>Page text</strong>. The buttons above the box make headings, lists, links and bold text, and you can drop photos into the text.</li>
+<li>Write the <strong>Page text</strong>. The buttons above the box make bold and italic text, links and pictures. The ¶ menu at their left turns a paragraph into a heading, a list or a quote.</li>
 <li>Add <strong>Photos</strong> underneath if you want a gallery at the bottom.</li>
 <li>Click <strong>Save</strong>.</li>
 </ol>
@@ -220,10 +232,11 @@
 
 <section id="instagram">
 <h2><small>Nothing to do</small>The Instagram posts</h2>
-<p>The home page shows the club's latest Instagram posts. Once a day the website checks Instagram and adds anything new by itself. Post on Instagram as usual and it will appear here by the next morning.</p>
+<p>The home page has a place for the club's latest Instagram posts. Kevin connects the club's Instagram account to the website once. Until he has, the home page shows only a Follow button.</p>
+<p>After that, the website checks Instagram once a day and adds anything new by itself. Post on Instagram as usual and it will appear here by the next morning.</p>
 <details class="why">
 <summary>How does that work?</summary>
-<p>The club's Instagram account is connected to a small service called Behold, which hands the website a list of recent posts. Early each morning the website saves a copy of each new post's picture into its own folder, so the pictures keep working even after Instagram's own links expire.</p>
+<p>The connection goes through a small service called Behold, which hands the website a list of recent posts. Early each morning the website saves a copy of each new post's picture into its own folder, so the pictures keep working even after Instagram's own links expire.</p>
 <p>To take a post off the website, delete it on Instagram and tell Kevin: the saved copy has to be removed by hand.</p>
 </details>
 </section>
@@ -232,10 +245,11 @@
 <h2><small>People, press and pages</small>Delete something</h2>
 <ol class="steps">
 <li>Open the team member, press mention or page.</li>
-<li>Click the three dots at the top right, then <strong>Delete</strong>.</li>
+<li>Click the three dots at the very top right, then <strong>Delete</strong>.
+<figure class="shot small"><img src="guide/delete-menu.jpg" width="420" height="280" loading="lazy" alt="The menu under the three dots at the top right of an entry: Duplicate, Delete, Edit Slug, Revert All Changes, Restore Default and Clear All."><figcaption>The menu under the three dots.</figcaption></figure></li>
 <li>Click <strong>Delete</strong> again to confirm.</li>
 </ol>
-<p>The four main pages cannot be deleted.</p>
+<p>The four main pages cannot be deleted: their menu has no Delete.</p>
 <details class="why">
 <summary>Is it gone forever?</summary>
 <p>No. GitHub keeps the history of every change, including deletions, so anything removed by mistake can be brought back. Ask Kevin and say roughly when it was deleted.</p>
@@ -247,14 +261,18 @@
 <p>Claude is an AI assistant. On the <a href="ask.html">Ask Claude</a> page the website is on the left and Claude is on the right. You say what you want in your own words, and you watch the change appear on the left before anyone else can see it.</p>
 <ol class="steps">
 <li>Open <a href="ask.html">Ask Claude</a> and click <strong>Sign in with GitHub</strong>, the same account as the editor.</li>
-<li>Type what you want. For example: "Add a new person to the team page", "Shorten the first paragraph on the About page", or "Make the Donate button bigger".</li>
+<li>Type what you want and press <strong>Send</strong>. For example: "Add a new person to the team page", "Shorten the first paragraph on the About page", or "Make the Donate button bigger".
+<figure class="shot"><img src="guide/ask.jpg" width="800" height="500" loading="lazy" alt="Ask Claude: the club's home page on the left, and on the right a box labelled What would you like changed, with Send and Add photos under it."><figcaption>Ask Claude. The website is on the left and Claude is on the right.</figcaption></figure></li>
 <li>To talk about one particular thing on the page, click <strong>Point at something</strong> above the website, then click the thing itself. Then say what should happen to it.</li>
-<li>To use a photo, attach it to your message.</li>
-<li>If the result is what you meant, press <strong>Publish</strong>. If it is not, say what to fix, or press <strong>Discard these changes</strong> to drop it.</li>
+<li>To use a photo, click <strong>Add photos</strong> under the message box and pick it.</li>
+<li>Claude's answer says what it changed, and the website on the left already shows it. If it is what you meant, press <strong>Publish</strong>. If it is not, say what to fix, or press <strong>Discard these changes</strong> to drop it.</li>
 <li>Give it a minute, then open the real site and look.</li>
 </ol>
 <p>Claude can change wording, team members, press mentions, pages and photos, and how things look: colours, sizes, spacing. It cannot invent a new kind of section or feature; that is still Kevin.</p>
 <p>The donation form itself does not run in Claude's preview. A note stands in for it there, and the real form is on the real site.</p>
+<p>Drag the bar between the two sides to make Claude's side wider or narrower. <strong>Hide</strong> tucks it away so the website fills the window, and <strong>Show Claude</strong> brings it back.</p>
+<p><strong>On a phone</strong> the two sides become two tabs at the top: <strong>Claude</strong> and <strong>The site</strong>. Tap The site to see the change, and Claude to carry on.</p>
+<figure class="shot small"><img src="guide/ask-phone.jpg" width="375" height="812" loading="lazy" style="max-width: min(100%, 17rem)" alt="Ask Claude on a phone, with two tabs at the top, Claude and The site, and the message box at the bottom."><figcaption>Ask Claude on a phone.</figcaption></figure>
 <details class="why">
 <summary>What am I looking at on the left?</summary>
 <p>A copy of the website built right there in your browser, from the site's files plus whatever Claude has prepared. It is not the real site, so nothing you see there is public until you press Publish.</p>
@@ -274,7 +292,8 @@
 <ul class="plain">
 <li><strong>I saved, but the site looks the same.</strong> Wait two minutes, then reload the page. On a phone, pull down to refresh.</li>
 <li><strong>The Save button is grey.</strong> Nothing has changed yet.</li>
-<li><strong>A box has a red message under it.</strong> It needs a different kind of value: a link that starts with https://, or an address on the right service.</li>
+<li><strong>I pressed Save and a red bar says fields have errors.</strong> Nothing was saved. Each box that needs fixing has a red message above it: a box with a red star was left empty, or a link is not a full address starting with https://. Fix them and press Save again. <strong>Show Errors</strong> in the red bar jumps to each one.
+<figure class="shot"><img src="guide/link-refused.jpg" width="800" height="340" loading="lazy" alt="A Link box holding the words not a link, with a red message above it saying Paste the full address, starting with https://, and a red bar at the bottom saying 4 fields have errors."><figcaption>A link that is not a full address is turned away.</figcaption></figure></li>
 <li><strong>I changed something and it looks wrong.</strong> Open it again, fix it and save. If you cannot get it back to how it was, ask Kevin: every save is recorded and can be undone.</li>
 <li><strong>It is asking me to sign in again.</strong> Click <strong>Sign In with GitHub</strong>. Nothing is lost.</li>
 <li><strong>Anything else.</strong> Text Kevin.</li>
