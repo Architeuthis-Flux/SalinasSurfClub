@@ -11,6 +11,13 @@ backend:
 
 site_url: https://architeuthis-flux.github.io/SalinasSurfClub/
 
+# File names of new entries: plain letters only, so "José Núñez" is saved as jose-nunez.json.
+# Ask Claude only sees entries whose file names are lowercase letters, digits and hyphens.
+slug:
+  encoding: ascii
+  clean_accents: true
+  sanitize_replacement: "-"
+
 # Every uploaded photo lands in one folder, shrunk to web size on the way in (phone photos are 5-10 MB).
 media_folder: photos
 public_folder: /photos
@@ -56,7 +63,7 @@ collections:
     fields:
       - { name: title, label: Headline, widget: string, hint: "The title of the article or film, as published." }
       - { name: outlet, label: Published by, widget: string, hint: 'For example "Monterey County NOW".' }
-      - { name: date, label: Date published, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false }
+      - { name: date, label: Date published, widget: datetime, type: date }
       - { name: kind, label: Type, widget: select, options: [Article, Film], default: Article, hint: 'Decides whether the button says "Read the article" or "Watch the film".' }
       - name: url
         label: Link
