@@ -1,0 +1,185 @@
+# Editor setup for Salinas Surf Club (Sveltia CMS, https://sveltiacms.app).
+# Each collection below is a form. Saving commits a JSON file to the repo; the site rebuilds in about a minute.
+# If the repo is renamed or transferred to another account, change `repo` below.
+
+backend:
+  name: github
+  repo: Architeuthis-Flux/SalinasSurfClub
+  branch: main
+  # Sign-in server (shared, deployed from the friend-sites kit): makes the "Sign In with GitHub" button work.
+  base_url: https://crabbe-construction-auth.kevinc-af9.workers.dev
+
+site_url: https://architeuthis-flux.github.io/SalinasSurfClub/
+
+# Every uploaded photo lands in one folder, shrunk to web size on the way in (phone photos are 5-10 MB).
+media_folder: photos
+public_folder: /photos
+media_libraries:
+  default:
+    config:
+      slugify_filename: true
+      transformations:
+        raster_image:
+          format: webp
+          quality: 80
+          width: 1800
+          height: 1800
+
+collections:
+  - name: team
+    label: Team
+    label_singular: Team member
+    description: One entry per person on the Meet the team page.
+    folder: content/team
+    format: json
+    extension: json
+    create: true
+    editor:
+      preview: false
+    fields:
+      - { name: title, label: Name, widget: string }
+      - { name: role, label: Role, widget: string, required: false, hint: 'For example "Founder" or "Volunteer surf instructor".' }
+      - { name: photo, label: Photo, widget: image, required: false, hint: "A portrait works best. Shown in a white frame." }
+      - { name: bio, label: About them, widget: text, required: false, hint: "A sentence or two. Leave a blank line to start a new paragraph." }
+      - { name: order, label: Position, widget: number, value_type: int, min: 0, default: 0, required: false, hint: "Lower numbers show first. People with the same number are listed by name." }
+
+  - name: press
+    label: Press
+    label_singular: Press mention
+    description: Articles and films about the club. The newest shows first.
+    folder: content/press
+    format: json
+    extension: json
+    create: true
+    editor:
+      preview: false
+    fields:
+      - { name: title, label: Headline, widget: string, hint: "The title of the article or film, as published." }
+      - { name: outlet, label: Published by, widget: string, hint: 'For example "Monterey County NOW".' }
+      - { name: date, label: Date published, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false }
+      - { name: kind, label: Type, widget: select, options: [Article, Film], default: Article, hint: 'Decides whether the button says "Read the article" or "Watch the film".' }
+      - name: url
+        label: Link
+        widget: string
+        pattern: ['^https?://\S+$', 'Paste the full address, starting with https://']
+        hint: Copy it from the address bar of the article or video.
+      - { name: summary, label: One-line description, widget: text, required: false, hint: "In your own words. Do not paste the article's text." }
+
+  - name: pages
+    label: Extra pages
+    label_singular: Page
+    description: Any other page, for example "Our Sponsors" or "Sign up". Each one can appear in the menu.
+    folder: content/pages
+    format: json
+    extension: json
+    create: true
+    editor:
+      preview: false
+    fields:
+      - { name: title, label: Page title, widget: string, hint: "The page address and the menu link come from this." }
+      - { name: menu, label: Show in the menu, widget: boolean, default: true }
+      - { name: intro, label: Opening line, widget: string, required: false, hint: "Optional. One sentence under the title." }
+      - name: body
+        label: Page text
+        widget: richtext
+        format: html
+        required: false
+        modes: [rich_text]
+        buttons: [bold, italic, link, heading-two, heading-three, bulleted-list, numbered-list, quote]
+        editor_components: [image]
+      - { name: photos, label: Photos, widget: image, multiple: true, required: false, hint: "Optional. Shown as a gallery under the text." }
+
+  - name: site
+    label: Main pages
+    description: The home, about, donate and contact pages, plus the details shown on every page.
+    editor:
+      preview: false
+    files:
+      - name: site
+        label: Home page and site details
+        file: content/site.json
+        fields:
+          - { name: name, label: Club name, widget: string }
+          - { name: area, label: Where you are, widget: string, required: false, hint: "Shown in the footer." }
+          - { name: since, label: Year the club started, widget: string, required: false }
+          - { name: email, label: Email address, widget: string, required: false, pattern: ['^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$', 'This needs to be an email address'], hint: "Shown in the footer and on the Contact page." }
+          - { name: instagram, label: Instagram user name, widget: string, required: false, pattern: ['^[A-Za-z0-9._]{1,30}$', 'Just the user name, without the @'], hint: "Without the @." }
+          - { name: nonprofit, label: Nonprofit statement, widget: text, required: false, hint: "Shown in the footer and on the Donate and Contact pages." }
+          - { name: tax_id, label: Tax ID (EIN), widget: string, required: false, pattern: ['^\d{2}-\d{7}$', 'An EIN looks like 12-3456789'] }
+          - { name: headline, label: Big words at the top, widget: text, hint: "One word or short phrase per line. Each line is shown very large." }
+          - { name: lede, label: Line under the big words, widget: string, required: false }
+          - { name: hero_photo, label: Photo behind the big words, widget: image, required: false, hint: "Optional. A wide photo works best. Without one the band is plain blue." }
+          - { name: mission_title, label: Mission heading, widget: string }
+          - { name: mission, label: Mission statement, widget: text, hint: "Leave a blank line to start a new paragraph." }
+          - name: facts
+            label: Quick facts
+            label_singular: Fact
+            widget: list
+            required: false
+            hint: Shown beside the mission statement.
+            fields:
+              - { name: title, label: Heading, widget: string }
+              - { name: text, label: Text, widget: text }
+          - { name: day_title, label: Heading above the steps of a surf day, widget: string, required: false }
+          - name: day
+            label: Steps of a surf day
+            label_singular: Step
+            widget: list
+            required: false
+            hint: Shown in this order, numbered. Remove them all to hide the section.
+            fields:
+              - { name: title, label: Heading, widget: string }
+              - { name: text, label: Text, widget: text }
+          - { name: feed_title, label: Heading above the Instagram posts, widget: string, required: false }
+          - { name: donate_title, label: Big words in the green band, widget: string, required: false }
+          - { name: donate_text, label: Line under them, widget: text, required: false }
+
+      - name: about
+        label: About page
+        file: content/about.json
+        fields:
+          - { name: title, label: Page title, widget: string }
+          - { name: intro, label: Opening line, widget: string, required: false }
+          - { name: photo, label: Photo, widget: image, required: false, hint: "Optional. Shown beside the text in a white frame." }
+          - { name: body, label: The story, widget: text, hint: "Leave a blank line to start a new paragraph." }
+
+      - name: donate
+        label: Donate page
+        file: content/donate.json
+        fields:
+          - { name: title, label: Page title, widget: string }
+          - { name: intro, label: Opening line, widget: string, required: false }
+          - name: zeffy_url
+            label: Zeffy donation form
+            widget: string
+            required: false
+            pattern: ['^https://(www\.)?zeffy\.com/\S+$', 'This must be the address of your form on zeffy.com, starting with https://']
+            hint: The address of the club's donation form on Zeffy. The form itself is shown on the page.
+          - { name: receipt_note, label: Note under the form, widget: text, required: false }
+          - name: venmo_url
+            label: Venmo link
+            widget: string
+            required: false
+            pattern: ['^https://((www|account)\.)?venmo\.com/\S+$', 'This must be an address on venmo.com, starting with https://']
+          - name: zelle_url
+            label: Zelle link
+            widget: string
+            required: false
+            pattern: ['^https://enroll\.zellepay\.com/\S+$', 'This must be the address behind your Zelle QR code, on enroll.zellepay.com']
+          - { name: zelle_to, label: Zelle email or phone, widget: string, required: false, hint: "Shown next to the Zelle button, for people who would rather type it into their bank's app." }
+          - { name: ways_title, label: Heading above the ways to help, widget: string, required: false }
+          - name: ways
+            label: Ways to help
+            label_singular: Way to help
+            widget: list
+            required: false
+            fields:
+              - { name: title, label: Heading, widget: string }
+              - { name: text, label: Text, widget: text }
+
+      - name: contact
+        label: Contact page
+        file: content/contact.json
+        fields:
+          - { name: title, label: Page title, widget: string }
+          - { name: intro, label: Opening line, widget: text, required: false, hint: "The email address and Instagram button come from the Home page and site details form." }

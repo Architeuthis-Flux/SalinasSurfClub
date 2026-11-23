@@ -1,0 +1,208 @@
+/* Salinas Surf Club
+   Colours: the bay, the foam, the sand, the lime green of the students' rash guards and the red
+   of the volunteers'. Red is kept for one thing: the Donate button.
+   Lettering: one family, Archivo. Headings use it wide, heavy and in capitals, the way the club's
+   own Instagram graphics are lettered; everything else uses it plain. */
+
+@font-face { font-family: "Archivo"; font-style: normal; font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; src: url(fonts/archivo.woff2) format("woff2"); }
+
+:root {
+  color-scheme: light;
+  --sea: #0a5868;        /* the bay: top bands, links, numerals */
+  --deep: #052a33;       /* deep water: text, header, footer */
+  --foam: #f1f7f6;       /* page background */
+  --sand: #ecdcb9;       /* the beach: the "Saturday" band */
+  --green: #a4e435;      /* the students' rash guards: accents and the closing band */
+  --red: #d6291f;        /* the volunteers' rash guards: the Donate button, nothing else */
+  --paper: #ffffff;      /* photo frames and cards */
+  --muted: #47626a;      /* secondary text */
+  --sans: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  --band: clamp(3.5rem, 8vw, 6.5rem);   /* vertical padding of a band */
+  /* A top band: sea, with its last few pixels already foam, so no hairline of sea shows under the swell. */
+  --band-fill: linear-gradient(to bottom, var(--sea) calc(100% - 6px), var(--foam) calc(100% - 6px));
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--foam); color: var(--deep); font: 400 1.0625rem/1.6 var(--sans); }
+img { display: block; max-width: 100%; height: auto; }
+a { color: inherit; text-underline-offset: .18em; }
+h1, h2, h3, p, figure, ul, ol { margin: 0; }
+h1, h2 { font-weight: 900; font-stretch: 125%; line-height: .95; letter-spacing: -.01em; text-transform: uppercase; text-wrap: balance; }
+h3 { font-size: 1.1rem; font-weight: 800; font-stretch: 110%; line-height: 1.25; }
+:focus-visible { outline: 3px solid var(--green); outline-offset: 3px; }
+.wrap { width: 100%; max-width: 72rem; margin-inline: auto; padding-inline: var(--gutter); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.skip { position: absolute; left: -999rem; }
+.skip:focus { left: 1rem; top: 1rem; z-index: 20; padding: .5rem 1rem; background: #fff; color: var(--deep); }
+.empty { font-size: 1.2rem; color: var(--muted); }
+
+/* ---------- buttons ---------- */
+.btn { display: inline-block; padding: .85rem 1.5rem; border: 2px solid currentColor; border-radius: 999px; font-weight: 700; font-stretch: 112%; line-height: 1; text-decoration: none; transition: background-color .15s, border-color .15s, color .15s; }
+.btn:hover { background: var(--deep); border-color: var(--deep); color: #fff; }
+.top .btn:hover, .hero .btn:hover, .page-head .btn:hover { background: #fff; border-color: #fff; color: var(--deep); }
+.btn.give, .top .btn.give, .hero .btn.give { background: var(--red); border-color: var(--red); color: #fff; }
+.btn.give:hover, .top .btn.give:hover, .hero .btn.give:hover { background: #fff; border-color: #fff; color: var(--red); }
+.give-band .btn.give:hover, .form-note .btn.give:hover { background: var(--deep); border-color: var(--deep); color: #fff; }
+
+/* ---------- header ---------- */
+.top { background: var(--deep); color: #fff; }
+.top .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem 1.5rem; padding-block: .55rem; }
+.brand { display: flex; flex: 1; align-items: center; gap: .6rem; min-width: 0; font-size: .74rem; font-weight: 900; font-stretch: 125%; line-height: 1.05; text-transform: uppercase; text-decoration: none; }
+.brand img { flex: none; width: 2.6rem; height: 2.6rem; border-radius: 50%; }
+.top nav { order: 3; display: flex; gap: 1.5rem; width: 100%; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+.top nav::-webkit-scrollbar { display: none; }
+.top nav a { padding-block: .45rem; border-bottom: 3px solid transparent; font-weight: 600; text-decoration: none; }
+.top nav a:hover, .top nav a[aria-current] { border-bottom-color: var(--green); }
+.top .btn { flex: none; padding: .6rem 1.15rem; }
+@media (min-width: 46rem) {
+  .top { position: sticky; top: 0; z-index: 10; }
+  .top nav { order: 0; width: auto; }
+  .brand { gap: .7rem; font-size: .9rem; }
+  .brand img { width: 3rem; height: 3rem; }
+}
+
+/* ---------- the swell under the top band of every page ---------- */
+.swell { position: absolute; left: 0; bottom: -1px; display: block; width: 100%; height: clamp(2.5rem, 7vw, 5.5rem); }
+.swell-back { fill: rgba(241, 247, 246, .32); }
+.swell-front { fill: var(--foam); }
+@media (prefers-reduced-motion: no-preference) {
+  .swell-back { animation: drift 16s linear infinite; }   /* one wavelength per turn, so the loop has no seam */
+}
+@keyframes drift { to { transform: translateX(-50%); } }
+
+/* ---------- home: top band ---------- */
+.hero { position: relative; overflow: hidden; background: var(--band-fill); color: #fff; }
+.hero .wrap { position: relative; display: grid; gap: 1.5rem; padding-block: clamp(2.5rem, 7vw, 5.5rem) clamp(5.5rem, 13vw, 10rem); }
+/* The big words are sized from the width of their own column, so a seven-letter word always fits on one line. */
+.hero-text { container-type: inline-size; min-width: 0; }
+.hero h1 { font-size: min(14.6cqi, 8.6rem); line-height: .86; overflow-wrap: anywhere; }
+.hero h1 span:not(.sr) { display: block; }
+.hero .lede { margin-top: 1.4rem; max-width: 26em; font-size: clamp(1.15rem, 2.1vw, 1.55rem); font-weight: 500; line-height: 1.35; }
+.actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.75rem; }
+.badge { order: -1; width: 7.5rem; border: .3rem solid #fff; border-radius: 50%; rotate: -6deg; }
+@media (min-width: 48rem) {
+  .hero .wrap { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2.5rem; }
+  .badge { order: 0; width: clamp(11rem, 24vw, 19rem); border-width: .45rem; rotate: 6deg; }
+}
+/* With a photo: the photo fills the band, darkened on the side the words sit on. */
+.hero-photo { position: absolute; inset: 0 0 6px; width: 100%; height: calc(100% - 6px); object-fit: cover; }
+.hero.has-photo::before { content: ""; position: absolute; inset: 0 0 6px; z-index: 1; background: linear-gradient(90deg, rgba(5, 42, 51, .86), rgba(5, 42, 51, .45)); }
+.hero.has-photo .wrap, .hero.has-photo .swell { z-index: 2; }
+
+/* ---------- home: mission ---------- */
+.mission .wrap { display: grid; gap: 2.5rem 4rem; padding-block: var(--band); }
+.mission h2, .day h2, .feed h2 { font-size: clamp(1.75rem, 4.2vw, 3.25rem); }
+.mission h2 { margin-bottom: 1.25rem; color: var(--sea); }
+.mission-text p { max-width: 34em; font-size: clamp(1.12rem, 1.6vw, 1.32rem); line-height: 1.5; }
+.mission-text p + p { margin-top: 1em; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1.75rem 2rem; align-content: start; }
+.facts > div { padding-top: .9rem; border-top: 5px solid var(--green); }
+.facts p { margin-top: .3rem; color: var(--muted); }
+@media (min-width: 58rem) { .mission .wrap { grid-template-columns: 1.15fr 1fr; } }
+.mission.plain { background: var(--sand); }
+.mission.plain .wrap { grid-template-columns: 1fr; }
+
+/* ---------- home: a Saturday with the club (a real sequence, so it is numbered) ---------- */
+.day { background: var(--sand); }
+.day .wrap { padding-block: var(--band); }
+.day ol { display: grid; grid-template-columns: repeat(auto-fit, minmax(11.5rem, 1fr)); gap: 2rem 1.5rem; margin-top: 2.5rem; padding: 0; list-style: none; counter-reset: step; }
+.day li { counter-increment: step; }
+.day li::before { content: counter(step); display: block; font-size: 3.6rem; font-weight: 900; font-stretch: 125%; line-height: 1; color: var(--sea); }
+.day h3 { margin-top: .5rem; }
+.day p { margin-top: .35rem; }
+
+/* ---------- home: Instagram ---------- */
+.feed .wrap { padding-block: var(--band); }
+.feed-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1rem 2rem; }
+.tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: .5rem; margin-top: 2rem; }
+.tiles a { display: block; aspect-ratio: 1; overflow: hidden; background: var(--sand); }
+.tiles img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+.tiles a:hover img { transform: scale(1.04); }
+@media (min-width: 48rem) { .tiles { grid-template-columns: repeat(4, 1fr); gap: .75rem; } }
+
+/* ---------- home: closing band ---------- */
+.give-band { background: var(--green); }
+.give-band .wrap { display: grid; gap: 1.25rem; justify-items: start; padding-block: var(--band); }
+.give-band h2 { font-size: clamp(2.2rem, 7.4vw, 6rem); line-height: .9; }
+.give-band p { max-width: 34em; font-size: clamp(1.1rem, 1.8vw, 1.3rem); font-weight: 500; }
+
+/* ---------- top band of the other pages ---------- */
+.page-head { position: relative; overflow: hidden; background: var(--band-fill); color: #fff; }
+.page-head .wrap { padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(5rem, 11vw, 8.5rem); }
+.page-head h1 { font-size: clamp(2.2rem, 7vw, 5.5rem); overflow-wrap: anywhere; }
+.page-head .lede { margin-top: 1rem; max-width: 34em; font-size: clamp(1.1rem, 2vw, 1.45rem); font-weight: 500; line-height: 1.35; }
+.story .wrap, .team .wrap, .press .wrap, .donate .wrap, .contact .wrap { padding-block: clamp(1rem, 3vw, 2rem) var(--band); }
+
+/* ---------- about, and pages the club adds ---------- */
+.story .wrap { display: grid; gap: 3rem; align-items: start; }
+.prose { max-width: 38em; font-size: 1.15rem; }
+.prose > * + * { margin-top: 1em; }
+.prose h2 { margin-top: 2em; font-size: 1.6rem; }
+.prose h3 { margin-top: 1.6em; font-size: 1.25rem; }
+.prose a { color: var(--sea); font-weight: 600; }
+.prose blockquote { margin-inline: 0; padding-left: 1.25rem; border-left: 5px solid var(--green); }
+/* A photo in a white frame, set down a little crooked, like the prints in the club's posts. */
+.snap { justify-self: start; max-width: 26rem; padding: .7rem .7rem 2.6rem; background: var(--paper); box-shadow: 0 .5rem 1.5rem rgba(5, 42, 51, .18); rotate: 2deg; }
+@media (min-width: 58rem) { .story .wrap:has(.snap) { grid-template-columns: 1.3fr 1fr; } }
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: .75rem; }
+.gallery img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+
+/* ---------- team ---------- */
+.members { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 2.5rem 2rem; }
+.member { padding: .8rem .8rem 1.4rem; background: var(--paper); box-shadow: 0 .4rem 1.2rem rgba(5, 42, 51, .14); }
+.member:nth-child(odd) { rotate: -1.2deg; }
+.member:nth-child(even) { rotate: 1deg; }
+.member img { width: 100%; aspect-ratio: 4 / 5; margin-bottom: 1rem; object-fit: cover; }
+.member.no-photo { padding-top: 1.4rem; border-top: 6px solid var(--green); }
+.member h2 { font-size: 1.3rem; }
+.member .role { margin-top: .35rem; font-weight: 700; color: var(--sea); }
+.member .bio { margin-top: .6rem; font-size: .98rem; }
+.member .bio p + p { margin-top: .8em; }
+
+/* ---------- press ---------- */
+.mentions { display: grid; padding: 0; list-style: none; }
+.mention { display: grid; gap: .5rem 2rem; padding-block: 2rem; border-top: 2px solid var(--deep); }
+.mention:last-child { border-bottom: 2px solid var(--deep); }
+.when { font-weight: 700; color: var(--sea); }
+.outlet { font-weight: 700; }
+.mention h2 { margin-block: .3rem .6rem; max-width: 30em; font-size: clamp(1.3rem, 2.6vw, 1.9rem); font-weight: 800; font-stretch: 100%; line-height: 1.15; letter-spacing: 0; text-transform: none; }
+.mention h2 a { text-decoration: none; }
+.mention h2 a:hover { text-decoration: underline; }
+.mention .btn { margin-top: 1.1rem; }
+@media (min-width: 48rem) { .mention { grid-template-columns: 12rem 1fr; } }
+
+/* ---------- donate ---------- */
+.donate .wrap { display: grid; gap: 3rem; align-items: start; }
+.zeffy { display: block; width: 100%; height: 58rem; border: 0; border-radius: .75rem; background: var(--paper); box-shadow: 0 .4rem 1.2rem rgba(5, 42, 51, .14); }
+.form-note { display: grid; gap: 1rem; justify-items: start; padding: 2rem; border-radius: .75rem; background: var(--paper); }
+.form-fallback, .receipt { margin-top: .9rem; font-size: .95rem; color: var(--muted); }
+.donate-side h2 { margin-bottom: 1rem; font-size: 1.4rem; }
+.donate-side h2:not(:first-child) { margin-top: 2.75rem; }
+.other { display: grid; gap: .9rem; padding: 0; list-style: none; }
+.other li { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; }
+.other .to { font-size: .95rem; color: var(--muted); }
+.ways { display: grid; gap: 1.25rem; }
+.ways p { color: var(--muted); }
+.donate-side .nonprofit { margin-top: 2.75rem; padding-top: 1.25rem; border-top: 2px solid var(--deep); }
+@media (min-width: 60rem) { .donate .wrap { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); } }
+
+/* ---------- contact ---------- */
+.contact .wrap { display: grid; gap: 1.75rem; justify-items: start; }
+.contact .big { font-size: clamp(1.35rem, 5.2vw, 3.2rem); font-weight: 900; font-stretch: 110%; line-height: 1.1; overflow-wrap: anywhere; text-decoration-color: var(--green); text-decoration-thickness: .12em; }
+.contact .nonprofit { margin-top: 1rem; color: var(--muted); }
+
+/* ---------- the nonprofit line and footer ---------- */
+.nonprofit { max-width: 32em; font-size: .95rem; }
+.nonprofit span { display: block; }
+.nonprofit span + span { margin-top: .25rem; font-weight: 700; }
+.foot { background: var(--deep); color: #cfe0e0; }
+.foot .wrap { display: grid; gap: 2rem; align-items: start; padding-block: 3rem; }
+.foot img { width: 5.5rem; border-radius: 50%; }
+.foot a { color: #fff; }
+.foot-name { font-weight: 900; font-stretch: 125%; line-height: 1.2; text-transform: uppercase; color: #fff; }
+.foot-links { display: grid; gap: .25rem; margin-top: .75rem; }
+.small { margin-top: 1rem; font-size: .85rem; }
+.small a { margin-left: .75rem; }
+@media (min-width: 48rem) { .foot .wrap { grid-template-columns: auto 1fr 1.3fr; gap: 2.5rem; } }

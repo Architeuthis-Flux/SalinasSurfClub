@@ -1,0 +1,9 @@
+{
+  "name": "salinas-surf-club",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.js _site",
+    "test": "node build.js --test && node scripts/sync-feed.mjs --test && node ask.site.test.mjs"
+  }
+}

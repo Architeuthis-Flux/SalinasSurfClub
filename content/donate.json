@@ -1,0 +1,24 @@
+{
+  "title": "Donate",
+  "intro": "Give Salinas kids a chance to surf, build confidence, and find a positive path forward.",
+  "zeffy_url": "https://www.zeffy.com/en-US/donation-form/donate-to-salinas-surf-club",
+  "receipt_note": "You will receive a tax receipt for a donation made through this form. We fundraise with Zeffy so that 100% of your donation goes to our work.",
+  "venmo_url": "https://www.venmo.com/u/salinassurfclub",
+  "zelle_url": "https://enroll.zellepay.com/qr-codes?data=eyJuYW1lIjoiU0FMSU5BUyBTVVJGIENMVUIiLCJhY3Rpb24iOiJwYXltZW50IiwidG9rZW4iOiJhZG1pbkBzYWxpbmFzc3VyZmNsdWIub3JnIn0=",
+  "zelle_to": "admin@salinassurfclub.org",
+  "ways_title": "How you can support",
+  "ways": [
+    {
+      "title": "Donate funds",
+      "text": "Helps cover surfboards, wetsuits, permits, and program costs."
+    },
+    {
+      "title": "Food and snacks",
+      "text": "We provide breakfast, snacks, and everything needed to fuel the day."
+    },
+    {
+      "title": "Transportation",
+      "text": "We provide the ride to and from the beach. Every dollar helps."
+    }
+  ]
+}

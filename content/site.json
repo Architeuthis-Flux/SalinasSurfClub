@@ -1,0 +1,58 @@
+{
+  "name": "Salinas Surf Club",
+  "area": "Salinas, California",
+  "since": "2017",
+  "email": "admin@salinassurfclub.org",
+  "instagram": "salinas_surf_club",
+  "nonprofit": "Salinas Surf Club is a 501(c)(3) tax-exempt nonprofit organization as recognized by the IRS.",
+  "tax_id": "33-2185571",
+  "headline": "Surf\nConnect\nBelong",
+  "lede": "Empowering our community one wave at a time.",
+  "hero_photo": "",
+  "mission_title": "Our mission",
+  "mission": "Salinas Surf Club connects first responders, lifeguards, healthcare workers, and community surfers with at-risk youth in East Salinas, introducing them to the benefits of surfing, nature exploration, and environmental stewardship.\n\nOur mission is to empower youth from low-income, diverse backgrounds by fostering water safety, physical activity, and community pride, while providing positive role models and leadership opportunities.",
+  "facts": [
+    {
+      "title": "Zero cost to families",
+      "text": "All students need to do is sign up. Everything is provided."
+    },
+    {
+      "title": "Everything they need",
+      "text": "Surfboards, wetsuits, breakfast, snacks, and the ride to and from the beach."
+    },
+    {
+      "title": "Run by volunteers",
+      "text": "First responders, lifeguards, healthcare workers, and community surfers."
+    },
+    {
+      "title": "More than surfing",
+      "text": "Hiking and whale watching too, with overnight camping trips in the works."
+    }
+  ],
+  "day_title": "A Saturday with the club",
+  "day": [
+    {
+      "title": "The bus leaves Salinas",
+      "text": "A school bus picks students up in East Salinas and brings them to the beach in Monterey."
+    },
+    {
+      "title": "Suit up",
+      "text": "Volunteers hand out wetsuits and rash guards on the sand."
+    },
+    {
+      "title": "Warm up",
+      "text": "Everyone stretches and practices popping up on the board before getting wet."
+    },
+    {
+      "title": "Into the water",
+      "text": "Students pair up with volunteers, one-on-one or in small groups, and learn at their own pace."
+    },
+    {
+      "title": "Refuel",
+      "text": "Breakfast and snacks on the beach."
+    }
+  ],
+  "feed_title": "Lately on Instagram",
+  "donate_title": "Keep the stoke alive",
+  "donate_text": "Donations cover surfboards, wetsuits, permits, and program costs, so the kids never pay a thing."
+}

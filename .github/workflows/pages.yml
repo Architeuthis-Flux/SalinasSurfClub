@@ -1,0 +1,55 @@
+# Publishes the site. Runs when anything is saved (a push to main), once a day so new Instagram
+# posts appear, and on demand.
+#
+# The Instagram step needs one secret (repo, Settings, Secrets and variables, Actions):
+#   BEHOLD_FEED_URL   the address of the club's JSON feed on behold.so
+# Without it the step does nothing and the site still publishes.
+name: pages
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 13 * * *"   # 13:00 UTC, early morning in California
+  workflow_dispatch:
+permissions:
+  contents: write   # to save new Instagram posts into the repo
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      # New Instagram posts are saved into the repo, so their pictures never expire. A commit made
+      # here does not start this workflow again, which is why the same run goes on to publish.
+      # Neither step may stop a deploy: if Instagram is unreachable, the site keeps the posts it has.
+      - name: Fetch new Instagram posts
+        continue-on-error: true
+        env:
+          BEHOLD_FEED_URL: ${{ secrets.BEHOLD_FEED_URL }}
+        run: node scripts/sync-feed.mjs
+      - name: Save them in the repo
+        continue-on-error: true
+        run: |
+          mkdir -p photos && git add content/instagram.json photos
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "Instagram: new posts"
+            git push || echo "Someone saved at the same moment; the next run will save these posts."
+          fi
+      # Build only. The self-check (npm test) is for whoever changes the code: it fails on a dead
+      # link in the content, and content must never be able to stop a deploy.
+      - run: node --version && node build.js _site
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

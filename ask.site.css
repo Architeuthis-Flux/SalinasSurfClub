@@ -1,0 +1,13 @@
+/* The Ask Claude panel (ask.html) in this site's colours and typeface. */
+@font-face { font-family: "Archivo"; font-style: normal; font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; src: url(fonts/archivo.woff2) format("woff2"); }
+:root {
+  --ink: #052a33;
+  --deep: #052a33;
+  --slate: #0a5868;
+  --sand: #a4e435;
+  --sand-pale: #e6f1ef;
+  --paper: #f1f7f6;
+  --muted: #47626a;
+  --serif: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --sans: "Archivo", "Helvetica Neue", Arial, sans-serif;
+}

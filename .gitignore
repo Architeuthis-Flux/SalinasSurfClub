@@ -1,0 +1,9 @@
+_site/
+node_modules/
+.DS_Store
+.wrangler/
+.env
+# Kevin's working notes: not part of the site, and they hold private contact details.
+*.pages
+.remember/
+.claude/
