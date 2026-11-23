@@ -9,7 +9,7 @@ backend:
   # Sign-in server (shared, deployed from the friend-sites kit): makes the "Sign In with GitHub" button work.
   base_url: https://crabbe-construction-auth.kevinc-af9.workers.dev
 
-site_url: https://architeuthis-flux.github.io/SalinasSurfClub/
+site_url: https://salinassurfclub.org/
 
 # File names of new entries: plain letters only, so "José Núñez" is saved as jose-nunez.json.
 # Ask Claude only sees entries whose file names are lowercase letters, digits and hyphens.
