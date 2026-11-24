@@ -46,10 +46,12 @@ function checkDonate(d) {
 function checkEntry(folder, d) {
   if (!isText(d.title)) return folder === "team" ? 'A team member needs a "title": their name.' : 'This needs a "title".';
   if (folder === "team" && !blank(d.order) && !(typeof d.order === "number" && Number.isFinite(d.order) && d.order >= 0)) return '"order" must be a number, 0 or more. Lower shows first.';
+  if (folder === "team" && !blank(d.group) && !["board", "volunteers"].includes(d.group)) return '"group" must be "board" or "volunteers".';
   if (folder === "press") {
     if (!blank(d.url) && !webUrl(d.url)) return '"url" must be a full web address starting with https://, or empty.';
     if (!blank(d.date) && !/^\d{4}(-\d{2}-\d{2})?$/.test(d.date)) return '"date" must look like 2026-10-01, or just the year.';
     if (!blank(d.kind) && !["Article", "Film"].includes(d.kind)) return '"kind" must be "Article" or "Film".';
+    if (!blank(d.cover) && !(typeof d.cover === "string" && (/^\/photos\/[^/]+$/.test(d.cover) || (d.cover.startsWith("https://") && webUrl(d.cover))))) return '"cover" must be a photo on the site ("/photos/name") or a full https:// picture address, or empty.';
   }
   return "";
 }

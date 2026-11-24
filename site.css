@@ -156,22 +156,32 @@ h3 { font-size: 1.1rem; font-weight: 800; font-stretch: 110%; line-height: 1.25;
 .member:nth-child(even) { rotate: 1deg; }
 .member img { width: 100%; aspect-ratio: 4 / 5; margin-bottom: 1rem; object-fit: cover; }
 .member.no-photo { padding-top: 1.4rem; border-top: 6px solid var(--green); }
-.member h2 { font-size: 1.3rem; }
+.team h2 { margin-bottom: 1.75rem; font-size: clamp(1.5rem, 3.4vw, 2.4rem); color: var(--sea); }
+.team .wrap { padding-bottom: clamp(2.5rem, 5vw, 4rem); }
+.team:last-of-type .wrap { padding-bottom: var(--band); }
+.team + .team .wrap { padding-top: 0; }
+.member h3 { font-size: 1.3rem; font-weight: 900; font-stretch: 125%; line-height: .95; letter-spacing: -.01em; text-transform: uppercase; }
 .member .role { margin-top: .35rem; font-weight: 700; color: var(--sea); }
 .member .bio { margin-top: .6rem; font-size: .98rem; }
 .member .bio p + p { margin-top: .8em; }
 
 /* ---------- press ---------- */
-.mentions { display: grid; padding: 0; list-style: none; }
-.mention { display: grid; gap: .5rem 2rem; padding-block: 2rem; border-top: 2px solid var(--deep); }
-.mention:last-child { border-bottom: 2px solid var(--deep); }
+/* Each mention is a card. Its cover picture sits behind the right-hand side and fades out towards the words. */
+.mentions { display: grid; gap: 1.5rem; padding: 0; list-style: none; }
+.mention { position: relative; display: grid; gap: .5rem 2rem; overflow: hidden; padding: clamp(1.25rem, 3vw, 2rem); border-left: 6px solid var(--green); background: var(--paper); box-shadow: 0 .4rem 1.2rem rgba(5, 42, 51, .12); }
+.mention > * { position: relative; }
+.mention .cover { position: static; width: calc(100% + 2 * clamp(1.25rem, 3vw, 2rem)); height: 10rem; margin: calc(-1 * clamp(1.25rem, 3vw, 2rem)) calc(-1 * clamp(1.25rem, 3vw, 2rem)) 0; background: center / cover no-repeat; -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent); mask-image: linear-gradient(to bottom, #000 35%, transparent); }
 .when { font-weight: 700; color: var(--sea); }
 .outlet { font-weight: 700; }
 .mention h2 { margin-block: .3rem .6rem; max-width: 30em; font-size: clamp(1.3rem, 2.6vw, 1.9rem); font-weight: 800; font-stretch: 100%; line-height: 1.15; letter-spacing: 0; text-transform: none; }
 .mention h2 a { text-decoration: none; }
 .mention h2 a:hover { text-decoration: underline; }
 .mention .btn { margin-top: 1.1rem; }
-@media (min-width: 48rem) { .mention { grid-template-columns: 12rem 1fr; } }
+@media (min-width: 48rem) {
+  .mention { grid-template-columns: 11rem 1fr; }
+  .mention.has-cover > div { max-width: 62%; }
+  .mention .cover { position: absolute; inset: 0 0 0 auto; width: 52%; height: 100%; margin: 0; -webkit-mask-image: linear-gradient(to right, transparent 4%, rgba(0, 0, 0, .3) 30%, #000 72%); mask-image: linear-gradient(to right, transparent 4%, rgba(0, 0, 0, .3) 30%, #000 72%); }
+}
 
 /* ---------- donate ---------- */
 .donate .wrap { display: grid; gap: 3rem; align-items: start; }

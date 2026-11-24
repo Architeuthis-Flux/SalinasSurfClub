@@ -15,10 +15,10 @@ import { cpSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, 
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildSite, donateUrl, esc, instagramHandle, longDate, num, paras, rich, slugify, webUrl, zeffyEmbed } from "./render.js";
+import { buildSite, cssUrl, donateUrl, esc, instagramHandle, longDate, num, paras, rich, slugify, webUrl, zeffyEmbed } from "./render.js";
 
 const SRC = dirname(fileURLToPath(import.meta.url));
-const ASSETS = ["admin", "fonts", "guide.html", "ask.html", "ask.js", "ask.site.js", "ask.site.css",
+const ASSETS = ["admin", "fonts", "guide.html", "receipt.html", "receipt.js", "ask.html", "ask.js", "ask.site.js", "ask.site.css",
   "render.js", "site.css", "logo.png"];   // published as they are; each must exist
 const OPTIONAL = ["photos", "guide"];     // folders that exist only once they hold a file (git keeps no empty folders)
 const DESIGN = "content/design.css";      // design overrides, published as design.css next to site.css
@@ -117,6 +117,7 @@ function selftest() {
   assert.equal(zeffyEmbed("https://www.zeffy.com/donation-form/x-1/"), "https://www.zeffy.com/embed/donation-form/x-1");
   assert.equal(zeffyEmbed("https://www.zeffy.com/en-US/ticketing/x"), "");
   assert.equal(zeffyEmbed("https://evil.example/donation-form/x"), "");
+  assert.equal(cssUrl('photos/a b").x{y}\\.jpg'), "photos/a%20b%22%29.x{y}%5c.jpg");
   assert.deepEqual([instagramHandle("salinas_surf_club"), instagramHandle("a/b"), instagramHandle(""), instagramHandle(null)], ["salinas_surf_club", "", "", ""]);
 
   // A made-up site: ordering, the menu, a reserved name, a broken file, a missing photo, bad links, escaping.
@@ -133,9 +134,11 @@ function selftest() {
     ] }),
     "content/team/b-second.json": JSON.stringify({ title: "Second <i>", order: 2, role: "Volunteer", photo: "/photos/a.webp" }),
     "content/team/a-first.json": JSON.stringify({ title: "First", order: 0, photo: "/photos/gone.jpg" }),
+    "content/team/c-chair.json": JSON.stringify({ title: "Chair", order: 5, group: "board" }),
     "content/team/broken.json": "{ not json",
-    "content/press/old.json": JSON.stringify({ title: "Old", date: "2020-01-14", kind: "Film", url: "https://youtu.be/x", outlet: "Out" }),
-    "content/press/new.json": JSON.stringify({ title: "New", date: "2026-10-01", kind: "Article", url: "javascript:alert(1)" }),
+    "content/press/old.json": JSON.stringify({ title: "Old", date: "2020-01-14", kind: "Film", url: "https://youtu.be/abcDEF_1234", outlet: "Out" }),
+    "content/press/new.json": JSON.stringify({ title: "New", date: "2026-10-01", kind: "Article", url: "javascript:alert(1)", cover: "http://plain.example/x.jpg" }),
+    "content/press/mid.json": JSON.stringify({ title: "Mid", date: "2022-12-12", cover: "https://pics.example/y.jpg?a=1&b=2" }),
     "content/pages/sponsors.json": JSON.stringify({ title: "Our Sponsors", body: '<p><img src="/photos/a.webp"></p>' }),
     "content/pages/hidden.json": JSON.stringify({ title: "Hidden", menu: false }),
     "content/pages/donate.json": JSON.stringify({ title: "Would overwrite the Donate page" }),
@@ -152,10 +155,14 @@ function selftest() {
   assert.ok(index.includes('href="https://www.instagram.com/p/AbC-1_x/"') && index.includes('alt="Hello &lt;world&gt;"'));
   assert.ok(!index.includes("evil.example") && !index.includes("gone"));               // a post from elsewhere, and one whose picture is missing
   const team = made.pages.get("team.html");
-  assert.ok(team.indexOf(">First<") < team.indexOf("Second &lt;i&gt;") && !team.includes("gone.jpg"));
+  assert.ok(team.indexOf("Board and leadership") < team.indexOf(">Chair<") && team.indexOf(">Chair<") < team.indexOf(">Volunteers<"));   // the board first
+  assert.ok(team.indexOf(">Volunteers<") < team.indexOf("Second &lt;i&gt;") && team.indexOf("Second &lt;i&gt;") < team.indexOf(">First<"));   // then volunteers, the one with a photo first
+  assert.ok(!team.includes("gone.jpg"));
   const press = made.pages.get("press.html");
   assert.ok(press.indexOf(">New<") < press.indexOf(">Old<"));                           // newest first
   assert.ok(press.includes("October 1, 2026") && press.includes("Watch the film") && !press.includes("javascript:"));
+  assert.ok(press.includes('url(&quot;https://i.ytimg.com/vi/abcDEF_1234/hqdefault.jpg&quot;)'));       // a YouTube link brings its own picture
+  assert.ok(press.includes('url(&quot;https://pics.example/y.jpg?a=1&amp;b=2&quot;)') && !press.includes("plain.example"));   // https only
   const donate = made.pages.get("donate.html");
   assert.ok(donate.includes('src="https://www.zeffy.com/embed/donation-form/test"'));
   assert.ok(donate.includes("enroll.zellepay.com") && !donate.includes("evil.example") && donate.includes("Tax ID: 12-3456789"));

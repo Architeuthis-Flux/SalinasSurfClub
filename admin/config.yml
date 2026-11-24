@@ -48,7 +48,14 @@ collections:
       - { name: role, label: Role, widget: string, required: false, hint: 'For example "Founder" or "Volunteer surf instructor".' }
       - { name: photo, label: Photo, widget: image, required: false, hint: "A portrait works best. Shown in a white frame." }
       - { name: bio, label: About them, widget: text, required: false, hint: "A sentence or two. Leave a blank line to start a new paragraph." }
-      - { name: order, label: Position, widget: number, value_type: int, min: 0, default: 0, required: false, hint: "Lower numbers show first. People with the same number are listed by name." }
+      - name: group
+        label: Listed under
+        widget: select
+        default: volunteers
+        options:
+          - { label: Volunteers, value: volunteers }
+          - { label: Board and leadership, value: board }
+      - { name: order, label: Position, widget: number, value_type: int, min: 0, default: 0, required: false, hint: "Lower numbers show first. People with a photo are always listed before people without one." }
 
   - name: press
     label: Press
@@ -71,6 +78,7 @@ collections:
         pattern: ['^https?://\S+$', 'Paste the full address, starting with https://']
         hint: Copy it from the address bar of the article or video.
       - { name: summary, label: One-line description, widget: text, required: false, hint: "In your own words. Do not paste the article's text." }
+      - { name: cover, label: Cover picture, widget: image, required: false, hint: "Optional. Shown faded behind the card. A YouTube link gets the video's own picture by itself. Only use a picture the club may use." }
 
   - name: pages
     label: Extra pages

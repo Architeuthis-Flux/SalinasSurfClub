@@ -86,6 +86,9 @@ export function zeffyEmbed(value) {
   return m ? `https://www.zeffy.com/embed/donation-form/${m[1]}` : "";
 }
 
+// An address about to sit inside CSS url("..."): the few characters that could end the string early are percent-encoded.
+export const cssUrl = (url) => String(url).replace(/["'\\()\s]/g, (c) => "%" + c.charCodeAt(0).toString(16).padStart(2, "0"));
+
 export const instagramHandle = (value) => (/^[A-Za-z0-9._]{1,30}$/.test(String(value ?? "")) ? String(value) : "");
 const POST = /^https:\/\/www\.instagram\.com\/(?:p|reel|tv)\/[A-Za-z0-9_-]+\/?$/;
 
@@ -157,9 +160,11 @@ export function buildSite({ files, hasPhoto, photoUrl = (name) => "photos/" + na
   const handle = instagramHandle(site.instagram);
   const instagram = handle ? `https://www.instagram.com/${handle}/` : "";
 
+  // People with a photo come first, then by position, then by name.
+  const bare = (p) => (photo(p.photo) ? 0 : 1);
   const team = load("team")
     .map((p, i) => ({ p, i }))
-    .sort((a, b) => num(a.p.order) - num(b.p.order) || compare(String(a.p.title).toLowerCase(), String(b.p.title).toLowerCase()) || a.i - b.i)
+    .sort((a, b) => bare(a.p) - bare(b.p) || num(a.p.order) - num(b.p.order) || compare(String(a.p.title).toLowerCase(), String(b.p.title).toLowerCase()) || a.i - b.i)
     .map(({ p }) => p);
   const press = load("press").sort((a, b) => compare(String(b.date ?? ""), String(a.date ?? "")) || compare(a.slug, b.slug));   // newest first
   const extraPages = [];
@@ -322,21 +327,38 @@ ${shot}
     const role = p.role ? `<p class="role"${mark(p.path, "role")}>${esc(p.role)}</p>` : "";
     return `<article class="member${shot ? "" : " no-photo"}">
 ${shot}
-<h2${mark(p.path, "title")}>${esc(p.title)}</h2>
+<h3${mark(p.path, "title")}>${esc(p.title)}</h3>
 ${role}
 <div class="bio"${mark(p.path, "bio")}>${paras(p.bio)}</div>
 </article>`;
   };
 
-  const teamPage = () => `${pageHead("Meet the team", "")}
-<section class="team"><div class="wrap">${team.length ? `<div class="members">${team.map(member).join("")}</div>` : `<p class="empty">The team page is on its way.</p>`}</div></section>`;
+  // Two groups: the board and leadership first, then the volunteers. Anyone not marked "board" is a volunteer.
+  const teamPage = () => {
+    const group = (title, people) => (people.length ? `<section class="team"><div class="wrap"><h2>${title}</h2><div class="members">${people.map(member).join("")}</div></div></section>` : "");
+    const groups = group("Board and leadership", team.filter((p) => p.group === "board")) + group("Volunteers", team.filter((p) => p.group !== "board"));
+    return `${pageHead("Meet the team", "")}
+${groups || `<section class="team"><div class="wrap"><p class="empty">The team page is on its way.</p></div></section>`}`;
+  };
+
+  // The picture behind a press card: one the club uploaded, a picture address on another site,
+  // or, for a YouTube link with neither, the video's own thumbnail.
+  const coverOf = (p) => {
+    const c = String(p.cover ?? "").trim();
+    if (/^https:\/\//.test(c)) return webUrl(c);
+    if (c) return photo(c);
+    const id = (/^https:\/\/(?:youtu\.be\/|(?:www\.)?youtube\.com\/watch\?v=)([A-Za-z0-9_-]{6,})/.exec(webUrl(p.url)) || [])[1];
+    return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : "";
+  };
 
   const mention = (p) => {
     const url = webUrl(p.url);
     const film = p.kind === "Film";
+    const cover = coverOf(p);
     const title = url ? `<a href="${esc(url)}" rel="noopener">${esc(p.title)}</a>` : esc(p.title);
     const go = url ? `<a class="btn" href="${esc(url)}" rel="noopener" aria-label="${film ? "Watch" : "Read"}: ${esc(p.title)}">${film ? "Watch the film" : "Read the article"}</a>` : "";
-    return `<li class="mention">
+    return `<li class="mention${cover ? " has-cover" : ""}">
+${cover ? `<div class="cover" style="background-image:url(&quot;${esc(cssUrl(cover))}&quot;)"${mark(p.path, "cover")}></div>` : ""}
 <p class="when"><time${/^\d{4}-\d{2}-\d{2}/.test(String(p.date)) ? ` datetime="${esc(String(p.date).slice(0, 10))}"` : ""}${mark(p.path, "date")}>${esc(longDate(p.date))}</time></p>
 <div>
 <p class="outlet"${mark(p.path, "outlet")}>${esc(p.outlet)}</p>

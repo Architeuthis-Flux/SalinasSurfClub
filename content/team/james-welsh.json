@@ -3,5 +3,6 @@
   "role": "Volunteer",
   "photo": "",
   "bio": "James leads the warm-up and the surf instruction on the beach.",
-  "order": 10
+  "order": 10,
+  "group": "volunteers"
 }

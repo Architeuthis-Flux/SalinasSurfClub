@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Donation receipt | Salinas Surf Club</title>
+<meta name="description" content="For the club's admins: fill in a donation acknowledgement letter, then save it as a PDF or email it.">
+<link rel="icon" href="logo.png">
+<link rel="stylesheet" href="site.css">
+<style>
+/* Receipt page. A form on the left, the letter on the right, exactly as it will print.
+   The letter is the club's own acknowledgement letter; only the look is added here. */
+.receipt { display: grid; gap: 2.5rem; align-items: start; padding-block: clamp(1.5rem, 4vw, 2.5rem) var(--band); }
+.fill { display: grid; gap: 1rem; }
+.fill h2 { font-size: 1.3rem; }
+.fill label { display: grid; gap: .3rem; font-weight: 700; font-size: .95rem; }
+.fill label small { font-weight: 400; color: var(--muted); }
+.fill input, .fill textarea { width: 100%; padding: .65rem .75rem; border: 2px solid var(--deep); border-radius: .4rem; background: var(--paper); color: var(--deep); font: 400 1rem/1.4 var(--sans); }
+.fill textarea { min-height: 4.5rem; resize: vertical; }
+.fill .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.fill .note { font-size: .92rem; color: var(--muted); }
+.fill .todo { min-height: 1.4em; font-size: .95rem; font-weight: 600; color: var(--red); }
+.fill .do { display: flex; flex-wrap: wrap; gap: .6rem; }
+.fill button { cursor: pointer; background: none; font-family: var(--sans); font-size: 1rem; }
+.fill button.give { border-color: var(--red); }
+.fill button:disabled { opacity: .45; cursor: not-allowed; }
+.fill button:disabled:hover { background: none; border-color: currentColor; color: inherit; }
+.fill button.give:disabled:hover { background: var(--red); border-color: var(--red); color: #fff; }
+
+/* The letter: US Letter proportions on screen, the real thing on paper. */
+.sheet { position: relative; display: flex; flex-direction: column; aspect-ratio: 8.5 / 11; overflow: hidden; padding: 6% 9% 0; background: #fff; color: #10262c; box-shadow: 0 .6rem 2rem rgba(5, 42, 51, .2); container-type: inline-size; line-height: 1.45; }
+/* Sized from the sheet's own width, so the letter keeps its proportions at any size and on paper. */
+.sheet .head, .sheet .body { font-size: clamp(.5rem, 2.15cqi, 1.25rem); }   /* about 11pt on paper */
+.sheet .head { display: flex; align-items: center; gap: 1.4em; padding-bottom: 1.1em; border-bottom: .28em solid var(--green); }
+.sheet .head img { width: 5.4em; height: 5.4em; border-radius: 50%; }
+.sheet .head b { display: block; font-size: 1.7em; font-weight: 900; font-stretch: 125%; line-height: 1; letter-spacing: -.01em; text-transform: uppercase; color: var(--deep); }
+.sheet .head span { display: block; margin-top: .5em; font-size: .92em; color: var(--muted); }
+.sheet .body { flex: 1; padding-top: 1.6em; }
+.sheet .body p { margin: 0; }
+.sheet .body p + p { margin-top: 1em; }
+.sheet .to { white-space: pre-line; }
+.sheet .sign { margin-top: 1em; }
+.sheet .sign b { font-weight: 700; }
+.sheet .blank { color: #a33; }
+.sheet .tail { position: relative; margin-inline: -11%; padding: 2.8em 11% 1.3em; font-size: clamp(.45rem, 1.75cqi, 1rem); color: var(--deep); }
+.sheet .tail svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.sheet .tail svg path:first-child { fill: rgba(10, 88, 104, .1); }
+.sheet .tail svg path:last-child { fill: rgba(10, 88, 104, .16); }
+.sheet .tail p { position: relative; margin: 0; }
+@media (min-width: 62rem) { .receipt { grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr); } .fill { position: sticky; top: 5rem; } }
+
+@page { size: letter; margin: 0; }
+@media print {
+  .top, .page-head, .fill, .foot, .skip { display: none !important; }
+  body { background: #fff; }
+  .wrap { max-width: none; padding: 0; }
+  .receipt { display: block; padding: 0; }
+  .sheet { width: 8.5in; height: 11in; aspect-ratio: auto; box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="wrap">
+<a class="brand" href="./"><img src="logo.png" alt="" width="48" height="48"><span>Salinas Surf Club</span></a>
+<nav aria-label="Admin"><a href="./">The site</a><a href="guide.html">Editing guide</a><a href="admin/">The editor</a></nav>
+</div></header>
+
+<main id="main">
+<header class="page-head"><div class="wrap">
+<h1>Donation receipt</h1>
+<p class="lede">For gifts by Venmo, Zelle, check or cash. Fill in the form, then save the letter as a PDF or email it. Gifts through the Zeffy form already get a receipt from Zeffy.</p>
+</div>
+<svg class="swell" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
+<path class="swell-back" d="M0 46c120-34 240-34 360 0s240 34 360 0 240-34 360 0 240 34 360 0 240-34 360 0 240 34 360 0v44H0z"/>
+<path class="swell-front" d="M0 62c90-26 180-26 270 0s180 26 270 0 180-26 270 0 180 26 270 0 180-26 270 0 90 13 90 13v15H0z"/>
+</svg>
+</header>
+
+<div class="wrap receipt">
+<form class="fill" id="fill" autocomplete="off">
+<h2>The gift</h2>
+<label>Donor's name <input name="donor" required></label>
+<label>Greeting <small>The letter opens "Dear …". Leave empty to use their first name.</small><input name="greeting"></label>
+<label>Donor's address <small>Optional. One line per row.</small><textarea name="address"></textarea></label>
+<div class="pair">
+<label>Amount <input name="amount" inputmode="decimal" placeholder="250" required></label>
+<label>Date of the gift <input name="giftDate" type="date" required></label>
+</div>
+<p class="note">This letter says nothing was given in return for the gift. If the donor got something for their money, such as a raffle ticket, a meal or a shirt, it needs different wording: check with the treasurer first.</p>
+<h2>The letter</h2>
+<div class="pair">
+<label>Date of the letter <input name="date" type="date" required></label>
+<label>Donor's email <small>For the Email button.</small><input name="email" type="email"></label>
+</div>
+<div class="pair">
+<label>Signed by <input name="signer" required></label>
+<label>Title <input name="title"></label>
+</div>
+<p class="todo" id="todo" role="status"></p>
+<div class="do">
+<button class="btn give" type="button" id="do-print">Save as PDF or print</button>
+<button class="btn" type="button" id="do-email">Email it</button>
+<button class="btn" type="button" id="do-copy">Copy the text</button>
+</div>
+<p class="note"><strong>Save as PDF or print</strong> opens the print window: choose "Save as PDF" there. <strong>Email it</strong> opens your mail app with the letter as the message. To attach the PDF as well, save it first and drag it into the email.</p>
+<p class="note">Nothing typed here is saved or sent anywhere by this page. Keep a copy of each letter for the club's records.</p>
+</form>
+
+<article class="sheet" id="sheet" aria-label="The letter" aria-live="polite">
+<div class="head"><img src="logo.png" alt="Salinas Surf Club logo"><div><b>Salinas Surf Club</b><span>A 501(c)(3) nonprofit in Salinas, California</span></div></div>
+<div class="body" id="body"></div>
+<div class="tail">
+<svg viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40c120-34 240-34 360 0s240 34 360 0 240-34 360 0 240 34 360 0v80H0z"/><path d="M0 62c90-26 180-26 270 0s180 26 270 0 180-26 270 0 180 26 270 0 180-26 270 0 90 13 90 13v45H0z"/></svg>
+<p>salinassurfclub.org &nbsp; admin@salinassurfclub.org &nbsp; Tax ID 33-2185571</p>
+</div>
+</article>
+</div>
+</main>
+
+<footer class="foot"><div class="wrap">
+<img src="logo.png" alt="" width="88" height="88" loading="lazy">
+<div class="foot-text"><p class="foot-name">Salinas Surf Club</p><p>Donation receipt</p></div>
+<div class="foot-legal"><p class="small"><a href="./">Back to the site</a> <a href="guide.html#receipt">How to use this</a></p></div>
+</div></footer>
+
+<script type="module">
+import { letter, missing, subject } from "./receipt.js";
+
+const form = document.getElementById("fill");
+const body = document.getElementById("body");
+const todo = document.getElementById("todo");
+const buttons = ["do-print", "do-email", "do-copy"].map((id) => document.getElementById(id));
+const box = form.elements;                          // the form's boxes, by name
+const KEEP = "surfclub-receipt-signer";            // only who signs is remembered, on this computer
+
+const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+const fields = () => Object.fromEntries(new FormData(form));
+const el = (tag, text, cls) => { const node = document.createElement(tag); node.textContent = text; if (cls) node.className = cls; return node; };
+
+box.date.value = today();
+box.signer.value = "Sa Vanna Baker Leyva";
+box.title.value = "Board Chair";
+try {
+  const saved = JSON.parse(localStorage.getItem(KEEP) || "null");
+  if (saved?.signer) { box.signer.value = saved.signer; box.title.value = saved.title ?? ""; }
+} catch { /* a browser that will not remember: the defaults stand */ }
+
+function draw() {
+  const f = fields();
+  const made = letter(f);
+  const gaps = missing(f);
+  body.replaceChildren(
+    el("p", made.date || "[Month Day, Year]", made.date ? "" : "blank"),
+    el("p", [made.donor || "Donor Name", ...made.address].join("\n"), made.donor ? "to" : "to blank"),
+    el("p", made.salutation),
+    ...made.body.map((text) => el("p", text)),
+    el("p", made.thanks),
+  );
+  // The tax ID in bold, as in the club's own letter.
+  const tax = body.children[5];
+  tax.innerHTML = tax.innerHTML.replace("33-2185571", "<b>33-2185571</b>");
+  const sign = el("p", "", "sign");
+  sign.append(made.closing, document.createElement("br"), el("b", made.signer || "[Name]"), document.createElement("br"), made.title);
+  body.append(sign);
+  todo.textContent = gaps.length ? "Still needed: " + gaps.join(", ") + "." : "";
+  for (const button of buttons) button.disabled = gaps.length > 0;
+  try { localStorage.setItem(KEEP, JSON.stringify({ signer: f.signer, title: f.title })); } catch { /* not remembered, nothing lost */ }
+}
+
+form.addEventListener("input", draw);
+form.addEventListener("submit", (e) => e.preventDefault());
+document.getElementById("do-print").addEventListener("click", () => window.print());
+document.getElementById("do-email").addEventListener("click", () => {
+  const f = fields();
+  const to = f.email.trim().replace(/[^\w.+@-]/g, "");          // an address only: nothing that could add its own headers
+  location.href = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(letter(f).text)}`;
+});
+document.getElementById("do-copy").addEventListener("click", async (e) => {
+  await navigator.clipboard.writeText(letter(fields()).text);
+  e.target.textContent = "Copied";
+  setTimeout(() => (e.target.textContent = "Copy the text"), 1500);
+});
+draw();
+</script>
+</body>
+</html>

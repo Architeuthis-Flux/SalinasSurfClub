@@ -3,5 +3,6 @@
   "role": "Volunteer",
   "photo": "/photos/team-burke.webp",
   "bio": "With the club since 2019. Burke creates all our t-shirt designs, has donated surfboards, and helps push our kids into waves.",
-  "order": 10
+  "order": 10,
+  "group": "volunteers"
 }
