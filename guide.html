@@ -39,6 +39,9 @@
 .why[open] { padding-bottom: 1.1rem; }
 .why > * + * { margin-top: .8rem; }
 .why p, .why li { font-size: 1rem; }
+.why.fine { border-left-width: 2px; background: none; }
+.why.fine summary { padding: .4rem 0; font-size: .85rem; font-weight: 500; color: var(--muted); }
+.why.fine p { font-size: .85rem; }
 </style>
 </head>
 <body>
@@ -79,7 +82,7 @@
 <li><a href="#home">Change the words on a page</a></li>
 <li><a href="#donate">Change the donation links</a></li>
 <li><a href="#page">Add a new page</a></li>
-<li><a href="#instagram">The Instagram posts</a></li>
+<li><a href="#instagram">Connect the club's Instagram</a></li>
 <li><a href="#delete">Delete something</a></li>
 <li><a href="#ask">Or ask Claude to do it</a></li>
 <li><a href="#help">If something goes wrong</a></li>
@@ -231,13 +234,38 @@
 </section>
 
 <section id="instagram">
-<h2><small>Nothing to do</small>The Instagram posts</h2>
-<p>The home page has a place for the club's latest Instagram posts. Kevin connects the club's Instagram account to the website once. Until he has, the home page shows only a Follow button.</p>
-<p>After that, the website checks Instagram once a day and adds anything new by itself. Post on Instagram as usual and it will appear here by the next morning.</p>
+<h2><small>Do this once, about ten minutes</small>Connect the club's Instagram</h2>
+<p>The home page shows the club's latest Instagram posts. Right now it shows eight that Kevin saved by hand. Once the club's Instagram account is connected, the website checks Instagram every morning and adds new posts by itself.</p>
+<p>The connection goes through a free service called Behold. Whoever has the club's Instagram login does this once.</p>
+<ol class="steps">
+<li>Go to <a href="https://behold.so">behold.so</a> and click <strong>Sign up free</strong>. Make the account with your own email address and a password only you know.</li>
+<li>Open <strong>Sources</strong> and click <strong>+ Add source</strong>. Choose <strong>Basic source</strong>, not Advanced.</li>
+<li>Click <strong>Connect</strong>. Instagram opens: log in as the club, <strong>salinas_surf_club</strong>, if it asks, then click <strong>Allow</strong>. Leave every permission switched on.</li>
+<li>Open <strong>Feeds</strong> and click <strong>Add feed</strong>. Choose a <strong>user feed</strong>, pick the club's account as its source, and choose <strong>JSON</strong> as the output. Click <strong>Create feed</strong>.</li>
+<li>The feed's page shows its feed URL: an address that starts with <strong>https://feeds.behold.so/</strong>. Copy it and send it to Kevin.</li>
+<li>Kevin stores that address with the website. From the next morning, new posts appear on the home page by themselves.</li>
+</ol>
+<p>After that there is nothing to do. Post on Instagram as usual and it will be on the website by the next morning.</p>
 <details class="why">
-<summary>How does that work?</summary>
-<p>The connection goes through a small service called Behold, which hands the website a list of recent posts. Early each morning the website saves a copy of each new post's picture into its own folder, so the pictures keep working even after Instagram's own links expire.</p>
-<p>To take a post off the website, delete it on Instagram and tell Kevin: the saved copy has to be removed by hand.</p>
+<summary>Behold says the account is a personal account</summary>
+<p>Behold can only connect a Business or Creator account. The club's account shows "Nonprofit organization" under its name, which is a sign it already is one. If Behold still says it is personal, click <strong>change</strong> in its message and follow the steps it gives. Switching is free and can be undone.</p>
+</details>
+<details class="why">
+<summary>How does it work?</summary>
+<p>Behold hands the website a list of the club's six most recent posts, refreshed once a day. Early each morning the website asks for that list and saves a copy of each new post's picture into its own folder, so the pictures keep working after Instagram's own links expire and the grid can hold more than six.</p>
+<p>The free plan is enough: the website asks about once a day, far under Behold's monthly limit.</p>
+</details>
+<details class="why">
+<summary>What if the club's Instagram password changes?</summary>
+<p>Behold loses its connection and has to be reconnected: open Behold, find the club's account under Sources, and authorize it again. Until then the website keeps showing the posts it already has.</p>
+</details>
+<details class="why">
+<summary>How do I take a post off the website?</summary>
+<p>Delete it on Instagram and tell Kevin: the saved copy has to be removed by hand.</p>
+</details>
+<details class="why fine">
+<summary>A note on these steps</summary>
+<p>They are written from Behold's own instructions, not from doing it on the club's account. A button may be worded a little differently when you get there.</p>
 </details>
 </section>
 
@@ -269,6 +297,7 @@
 <li>Give it a minute, then open the real site and look.</li>
 </ol>
 <p>Claude can change wording, team members, press mentions, pages and photos, and how things look: colours, sizes, spacing. It cannot invent a new kind of section or feature; that is still Kevin.</p>
+<p>Use it for anything, as often as you like. You cannot break the site by asking: nothing is public until you press Publish.</p>
 <p>The donation form itself does not run in Claude's preview. A note stands in for it there, and the real form is on the real site.</p>
 <p>Drag the bar between the two sides to make Claude's side wider or narrower. <strong>Hide</strong> tucks it away so the website fills the window, and <strong>Show Claude</strong> brings it back.</p>
 <p><strong>On a phone</strong> the two sides become two tabs at the top: <strong>Claude</strong> and <strong>The site</strong>. Tap The site to see the change, and Claude to carry on.</p>
@@ -281,9 +310,9 @@
 <summary>Can Claude change where donations go?</summary>
 <p>Only to another address on the same service, and it is told to ask you first. A link to anywhere else is refused before it reaches the preview.</p>
 </details>
-<details class="why">
+<details class="why fine">
 <summary>Does it cost anything?</summary>
-<p>Each request costs somewhere between a few cents and about twenty, which Kevin covers. Use it whenever it saves you time on a real change.</p>
+<p>Not to you. Kevin covers it and wants you to use it as much as you like.</p>
 </details>
 </section>
 

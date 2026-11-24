@@ -150,7 +150,7 @@ h3 { font-size: 1.1rem; font-weight: 800; font-stretch: 110%; line-height: 1.25;
 .gallery img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
 
 /* ---------- team ---------- */
-.members { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 2.5rem 2rem; }
+.members { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 2.5rem 2rem; align-items: start; }
 .member { padding: .8rem .8rem 1.4rem; background: var(--paper); box-shadow: 0 .4rem 1.2rem rgba(5, 42, 51, .14); }
 .member:nth-child(odd) { rotate: -1.2deg; }
 .member:nth-child(even) { rotate: 1deg; }

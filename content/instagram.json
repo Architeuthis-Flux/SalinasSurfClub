@@ -1,5 +1,70 @@
 {
-  "_note": "Filled in automatically from Instagram once a day by scripts/sync-feed.mjs. Do not edit by hand, except to remove a post.",
+  "_note": "Filled in automatically from Instagram once a day by scripts/sync-feed.mjs. Do not edit by hand, except to remove a post. The first eight posts were saved by hand on 2026-11-23, before the club's account was connected; their captions are shortened.",
   "username": "salinas_surf_club",
-  "posts": []
+  "posts": [
+    {
+      "shortcode": "Df3YfUBk4ot",
+      "permalink": "https://www.instagram.com/p/Df3YfUBk4ot/",
+      "caption": "Another look into our Saturday filled with good vibes! The waves were so large, so we transitioned to volleyball, soccer, and laying in the sunshine.",
+      "mediaType": "IMAGE",
+      "timestamp": "2026-11-16T00:00:00+0000",
+      "image": "/photos/ig-Df3YfUBk4ot.jpg"
+    },
+    {
+      "shortcode": "Df0zvVtG7xY",
+      "permalink": "https://www.instagram.com/p/Df0zvVtG7xY/",
+      "caption": "This past Saturday! With the biggest swell of the year hitting the coastline this weekend, it was important to educate our Surf Club students of the importance of beach safety.",
+      "mediaType": "IMAGE",
+      "timestamp": "2026-11-16T00:00:00+0000",
+      "image": "/photos/ig-Df0zvVtG7xY.jpg"
+    },
+    {
+      "shortcode": "DfiyKR2GSrN",
+      "permalink": "https://www.instagram.com/p/DfiyKR2GSrN/",
+      "caption": "Salinas Surf Club Volunteer Spotlight. He’s been showing up for our surf club for the past 4 years, sharing his love for surfing and helping our students build confidence in the water.",
+      "mediaType": "IMAGE",
+      "timestamp": "2026-11-09T00:00:00+0000",
+      "image": "/photos/ig-DfiyKR2GSrN.jpg"
+    },
+    {
+      "shortcode": "DfiDax_t3gk",
+      "permalink": "https://www.instagram.com/p/DfiDax_t3gk/",
+      "caption": "Our last surf session of the year is this Saturday at Wharf 2!! So grateful for another year filled with waves, smiles, and community.",
+      "mediaType": "IMAGE",
+      "timestamp": "2026-11-09T00:00:00+0000",
+      "image": "/photos/ig-DfiDax_t3gk.jpg"
+    },
+    {
+      "shortcode": "DfV6PSzGb3_",
+      "permalink": "https://www.instagram.com/p/DfV6PSzGb3_/",
+      "caption": "Surfboard Raffle!!! 100% of fundraiser proceeds will go towards getting our students out in the water and surfing.",
+      "mediaType": "IMAGE",
+      "timestamp": "2026-11-04T00:00:00+0000",
+      "image": "/photos/ig-DfV6PSzGb3_.jpg"
+    },
+    {
+      "shortcode": "DfQ0DWelIWU",
+      "permalink": "https://www.instagram.com/p/DfQ0DWelIWU/",
+      "caption": "Salinas Surf Club Sponsor Spotlight. They’ve hosted our annual fundraiser each year, helped us with fundraising promotion, and have hosted club lunches for our students!",
+      "mediaType": "IMAGE",
+      "timestamp": "2026-11-01T00:00:00+0000",
+      "image": "/photos/ig-DfQ0DWelIWU.jpg"
+    },
+    {
+      "shortcode": "De-oK4omYLZ",
+      "permalink": "https://www.instagram.com/p/De-oK4omYLZ/",
+      "caption": "Salinas Surf Club Volunteer Spotlight. Thank you for continuing to show up for our club and our students.",
+      "mediaType": "IMAGE",
+      "timestamp": "2026-10-26T00:00:00+0000",
+      "image": "/photos/ig-De-oK4omYLZ.jpg"
+    },
+    {
+      "shortcode": "De5iPc8lHRJ",
+      "permalink": "https://www.instagram.com/p/De5iPc8lHRJ/",
+      "caption": "Salinas Surf Club Volunteer Appreciation Night! Our surf club wouldn’t be what it is today without our incredible volunteer team!",
+      "mediaType": "IMAGE",
+      "timestamp": "2026-10-24T00:00:00+0000",
+      "image": "/photos/ig-De5iPc8lHRJ.jpg"
+    }
+  ]
 }
