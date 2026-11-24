@@ -56,6 +56,31 @@ function checkEntry(folder, d) {
   return "";
 }
 
+/* ---- the grey words in an empty conversation: the next thing the site still needs, worked out from
+   the published content, so the suggestion moves on by itself once that thing has been done. */
+
+const ANYTHING = "Or say anything else you want changed, or point at something on the page and say what should happen to it.";
+const listed = (names) => (names.length < 2 ? names.join("") : names.slice(0, -1).join(", ") + " and " + names.at(-1));
+
+export function hint(files) {
+  const team = [];
+  for (const [path, text] of files) {
+    if (!path.startsWith("content/team/")) continue;
+    try {
+      const person = JSON.parse(text);
+      if (isText(person?.title)) team.push(person);
+    } catch { /* a file that cannot be read is not counted */ }
+  }
+  // ponytail: "the board has been given" means more people under Board and leadership than the three
+  // found in public records when the site was made. If the real board is three people, lower the 4.
+  if (team.filter((p) => p.group === "board").length < 4) return `You can do things like: paste the names and titles of the club's board members, and I will add them all to the team page and then help with their photos. ${ANYTHING}`;
+  const bare = team.filter((p) => !isText(p.photo)).map((p) => p.title);
+  if (bare.length) return `You can do things like: drag photos of ${bare.length > 4 ? bare.slice(0, 4).join(", ") + " and the others who have none" : listed(bare)} onto this chat and say who is who. ${ANYTHING}`;
+  const quiet = team.filter((p) => !isText(p.bio)).map((p) => p.title);
+  if (quiet.length) return `You can do things like: tell me a little about ${quiet[0]}, and I will write it up for the team page. ${ANYTHING}`;
+  return `You can do things like: “Add a new person to the team page.” ${ANYTHING}`;
+}
+
 export default {
   id: "salinas-surf-club",              // the name the chat server knows this site by
   name: "Salinas Surf Club",
@@ -64,7 +89,7 @@ export default {
   branch: "main",
   chat: "https://crabbe-construction-chat.kevinc-af9.workers.dev",     // shared with Kevin's other friends' sites
   auth: "https://crabbe-construction-auth.kevinc-af9.workers.dev",
-  hint: "Say what you want changed. For example: “Add a new person to the team page.” Or point at something on the page and say what should happen to it.",
+  hint,                                 // a suggestion that follows what the site still needs (above)
 
   // What Claude may touch.
   design: "content/design.css",         // design overrides, published as design.css after site.css

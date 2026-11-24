@@ -234,6 +234,19 @@ async function loadRepo(at = CFG.branch) {
     text.set(path, state.repo.tree.get(path) === sha && state.repo.text.has(path) ? state.repo.text.get(path) : decode((await gh(`/git/blobs/${sha}`)).content));
   }));
   state.repo = { tree, text };
+  showHint();
+}
+
+// The grey words in an empty conversation. A site gives either fixed words, or a function of its
+// published content files (path -> text) that returns them, so the suggestion can follow what the
+// site still needs. Asked again after every load and every Publish.
+function showHint() {
+  if (typeof SITE.hint !== "function") return;
+  try {
+    $("log").dataset.hint = SITE.hint(new Map([...state.repo.text].filter(([path]) => isContent(path)))) || "";
+  } catch (e) {
+    console.error(e);            // a broken suggestion must never stop the page: the last words stand
+  }
 }
 
 /* ------------------------------------------------------------------ the preview */
@@ -1027,7 +1040,7 @@ async function run(job) {
 function wire() {
   document.title = `Ask Claude | ${SITE.name}`;
   if (SITE.icon) document.head.append(Object.assign(document.createElement("link"), { rel: "icon", href: SITE.icon }));
-  $("log").dataset.hint = SITE.hint;
+  $("log").dataset.hint = typeof SITE.hint === "function" ? "" : SITE.hint;   // a function is asked once the site is loaded (showHint)
   $("add-photos").hidden = PHOTOS === null;
   wireLayout();
   state.session = loadSession();

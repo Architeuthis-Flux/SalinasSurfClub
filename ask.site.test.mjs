@@ -3,6 +3,7 @@
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { checkPath, checkContent, label, pageFor, photoRefs, uniqueName, DESIGN, TOOL_NAMES } from "./ask.js";
+import { hint } from "./ask.site.js";
 
 const FEED = "content/instagram.json";
 
@@ -132,4 +133,18 @@ assert.deepEqual(photoRefs('{"photo": "/photos/a.webp", "photos": ["/photos/b-2.
 assert.deepEqual(photoRefs('{"title": "No photos here"}'), []);
 
 assert.deepEqual(TOOL_NAMES, ["list_site_files", "read_file", "write_file", "delete_file"]);
+
+// The suggestion in an empty conversation follows what the team page still needs.
+const person = (title, more = {}) => JSON.stringify({ title, role: "Volunteer", photo: "/photos/x.webp", bio: "Shows up every Saturday.", ...more });
+const teamOf = (...people) => new Map(people.map((text, i) => [`content/team/p${i}.json`, text]));
+const board = (n) => Array.from({ length: n }, (_, i) => person("Board " + i, { group: "board" }));
+assert.match(hint(new Map()), /board members/);
+assert.match(hint(new Map(readdirSync("content/team").map((f) => ["content/team/" + f, readFileSync("content/team/" + f, "utf8")]))), /names and titles of the club's board members/);   // the site as it is today
+assert.match(hint(teamOf(...board(3))), /board members/);
+assert.match(hint(teamOf(...board(4), person("Ana", { photo: "" }), person("Ben", { photo: undefined }))), /drag photos of Ana and Ben onto this chat/);
+assert.match(hint(teamOf(...board(4), ...["A", "B", "C", "D", "E"].map((n) => person(n, { photo: "" })))), /photos of A, B, C, D and the others who have none/);
+assert.match(hint(teamOf(...board(4), person("Cy", { bio: "" }))), /tell me a little about Cy,/);
+assert.match(hint(teamOf(...board(4))), /Add a new person to the team page/);
+assert.match(hint(teamOf(...board(4), "{ not json", "null", "[]", '{"role":"no name"}')), /Add a new person/);     // broken files are skipped, never thrown on
+assert.match(hint(new Map([["content/site.json", "{ not json"], ...teamOf(...board(4))])), /Add a new person/);
 console.log("ok (what Claude may touch)");
