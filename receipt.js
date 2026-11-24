@@ -1,5 +1,6 @@
 // The wording of the club's donation acknowledgement letter, used by receipt.html.
-// It only turns what was typed into text: no files, no network. Checked by receipt.test.mjs (npm test).
+// The letter only turns what was typed into text: no files, no network. The one thing here that asks a
+// server is mayUse, with the fetch it is handed. Checked by receipt.test.mjs (npm test).
 //
 // The wording is the club's own letter ("Donation Acknowledgement Letter"), word for word. It says
 // nothing was given in return for the gift, so it is only right for a plain gift of money.
@@ -72,3 +73,16 @@ export function letter(f) {
 }
 
 export const subject = `Thank you for your gift to ${CLUB}`;
+
+// May this signed-in person use the page? The same rule as Ask Claude: their GitHub sign-in can edit the
+// club's site. "yes" only on a clear yes from the chat server; "error" when it could not be asked.
+export async function mayUse(token, { chat, id }, fetcher = fetch) {
+  if (!token) return "no";
+  try {
+    const response = await fetcher(`${chat}/access?site=${encodeURIComponent(id)}`, { headers: { Authorization: `Bearer ${token}` } });
+    if (!response.ok) return "error";
+    return (await response.json())?.allowed === true ? "yes" : "no";
+  } catch {
+    return "error";
+  }
+}

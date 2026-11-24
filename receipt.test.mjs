@@ -1,6 +1,6 @@
 // Self-check for the donation receipt wording:  npm test
 import assert from "node:assert/strict";
-import { letter, missing, money, TAX_ID } from "./receipt.js";
+import { letter, mayUse, missing, money, TAX_ID } from "./receipt.js";
 
 // Amounts.
 assert.deepEqual([money(250), money("250"), money("$1,250.5"), money(0.5), money(1234567.891)], ["$250", "$250", "$1,250.50", "$0.50", "$1,234,567.89"]);
@@ -27,5 +27,17 @@ assert.deepEqual(missing({ ...full, amount: "-1", giftDate: "last week" }), ["th
 const blank = letter({});
 assert.ok(blank.body[0].includes("[donation amount] donation on [date]") && blank.salutation === "Dear [First Name],");
 assert.ok(!/undefined|null|NaN/.test(blank.text));
+
+// Who may use the page: only a clear yes from the chat server opens it. Everything else stays shut.
+const site = { chat: "https://chat.example", id: "salinas-surf-club" };
+const asked = [];
+const reply = (ok, body) => async (url, init) => { asked.push([url, init.headers.Authorization]); return { ok, json: async () => body }; };
+assert.equal(await mayUse("", site, () => assert.fail("no sign-in, nothing to ask")), "no");
+assert.equal(await mayUse("t0ken", site, reply(true, { allowed: true })), "yes");
+assert.deepEqual(asked, [["https://chat.example/access?site=salinas-surf-club", "Bearer t0ken"]]);
+for (const body of [{ allowed: false }, { allowed: "true" }, { allowed: 1 }, {}, null]) assert.equal(await mayUse("t", site, reply(true, body)), "no", JSON.stringify(body));
+assert.equal(await mayUse("t", site, reply(false, { allowed: true })), "error");                       // a refusal or a server fault
+assert.equal(await mayUse("t", site, async () => { throw new TypeError("offline"); }), "error");
+assert.equal(await mayUse("t", site, async () => ({ ok: true, json: async () => { throw new SyntaxError("not JSON"); } })), "error");
 
 console.log("ok (donation receipt)");

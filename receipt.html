@@ -10,7 +10,13 @@
 <link rel="stylesheet" href="site.css">
 <style>
 /* Receipt page. A form on the left, the letter on the right, exactly as it will print.
-   The letter is the club's own acknowledgement letter; only the look is added here. */
+   The letter is the club's own acknowledgement letter; only the look is added here.
+   Both stay hidden until the person has signed in as one of the club's editors. */
+[hidden] { display: none !important; }
+.gate { display: grid; gap: 1rem; justify-items: start; padding-block: clamp(2rem, 5vw, 3.5rem) var(--band); }
+.gate p { max-width: 34em; }
+.gate h2 { font-size: 1.6rem; }
+.gate button { cursor: pointer; font-family: var(--sans); font-size: 1rem; }
 .receipt { display: grid; gap: 2.5rem; align-items: start; padding-block: clamp(1.5rem, 4vw, 2.5rem) var(--band); }
 .fill { display: grid; gap: 1rem; }
 .fill h2 { font-size: 1.3rem; }
@@ -52,7 +58,7 @@
 
 @page { size: letter; margin: 0; }
 @media print {
-  .top, .page-head, .fill, .foot, .skip { display: none !important; }
+  .top, .page-head, .fill, .gate, .foot, .skip { display: none !important; }
   body { background: #fff; }
   .wrap { max-width: none; padding: 0; }
   .receipt { display: block; padding: 0; }
@@ -78,7 +84,13 @@
 </svg>
 </header>
 
-<div class="wrap receipt">
+<section class="wrap gate" id="gate">
+<h2>This page is for the club's editors</h2>
+<p id="gate-note" role="status">Sign in with the same GitHub account you use for the editor.</p>
+<button class="btn give" type="button" id="do-signin">Sign in with GitHub</button>
+</section>
+
+<div class="wrap receipt" id="receipt" hidden>
 <form class="fill" id="fill" autocomplete="off">
 <h2>The gift</h2>
 <label>Donor's name <input name="donor" required></label>
@@ -126,7 +138,8 @@
 </div></footer>
 
 <script type="module">
-import { letter, missing, subject } from "./receipt.js";
+import { letter, mayUse, missing, subject } from "./receipt.js";
+import SITE from "./ask.site.js";                   // which chat and sign-in servers, and the site's name on them
 
 const form = document.getElementById("fill");
 const body = document.getElementById("body");
@@ -183,6 +196,50 @@ document.getElementById("do-copy").addEventListener("click", async (e) => {
   setTimeout(() => (e.target.textContent = "Copy the text"), 1500);
 });
 draw();
+
+/* ---- the lock: the form and the letter show only to someone who can edit the club's site.
+   It shares its saved sign-in with the Ask Claude page, so signing in on one covers the other. */
+const SESSION = (SITE.store ?? "ask-" + SITE.id) + "-session";
+const ASK_IN = "Sign in with the same GitHub account you use for the editor.";
+const say = (text) => (document.getElementById("gate-note").textContent = text);
+
+async function enter(session, fresh) {
+  say("Checking your sign-in…");
+  const answer = await mayUse(session?.token, SITE);
+  if (answer === "yes") {
+    if (fresh) try { localStorage.setItem(SESSION, JSON.stringify(session)); } catch { /* not remembered: they sign in again next time */ }
+    document.getElementById("gate").hidden = true;
+    document.getElementById("receipt").hidden = false;
+    return;
+  }
+  say(answer === "error" ? "Could not check your sign-in. Check your internet connection, then try again."
+    : fresh ? "That GitHub account has not been added to the club's website yet. Ask Kevin to add you."
+    : ASK_IN);
+}
+
+// The same sign-in window the editor and Ask Claude use. The sign-in server only answers pages on the club's site.
+document.getElementById("do-signin").addEventListener("click", () => {
+  const origin = new URL(SITE.auth).origin;
+  const popup = window.open(`${SITE.auth}/auth?provider=github&site_id=${location.hostname}`, "receipt-sign-in", "width=620,height=720");
+  if (!popup) return say("Your browser blocked the sign-in window. Allow pop-ups for this page and try again.");
+  const listen = (event) => {
+    if (event.origin !== origin || typeof event.data !== "string") return;
+    if (event.data === "authorizing:github") return popup.postMessage(event.data, origin);
+    const done = event.data.match(/^authorization:github:(success|error):(.*)$/s);
+    if (!done) return;
+    window.removeEventListener("message", listen);
+    popup.close();
+    let payload = {};
+    try { payload = JSON.parse(done[2]); } catch { /* the plain message below */ }
+    if (done[1] !== "success" || !payload.token) return say("Sign-in did not work. Please try again.");
+    enter({ token: payload.token, refreshToken: payload.refreshToken }, true);
+  };
+  window.addEventListener("message", listen);
+});
+
+let saved = null;
+try { saved = JSON.parse(localStorage.getItem(SESSION)); } catch { /* nothing saved */ }
+enter(saved, false);
 </script>
 </body>
 </html>
