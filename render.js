@@ -211,13 +211,16 @@ export function buildSite({ files, hasPhoto, photoUrl = (name) => "photos/" + na
   const cams = [];
   for (const [i, c] of list(camsFile.cams).entries()) {
     const kind = String(c.kind ?? ""), link = webUrl(c.link);
-    const source = kind === "link" ? "" : camSource(kind, c.source);
+    // A camera can have several views from one spot (two cameras on one roof, say): each is a name and
+    // a feed of the camera's kind, the tile gets a button for each, and the first is shown to start with.
+    const views = list(c.views).map((v) => ({ name: String(v.name ?? "").trim(), source: camSource(kind, v.source) })).filter((v) => v.name && v.source);
+    const source = kind === "link" ? "" : views[0]?.source ?? camSource(kind, c.source);
     if (!c.name || !(kind === "link" ? link : source)) {
       warn(`camera ${i + 1} skipped${c.name ? ` (${c.name})` : ""}: it needs a name and ${kind === "link" ? "a link" : "a feed that fits its kind"}`);
       continue;
     }
     const lat = typeof c.lat === "number" && Math.abs(c.lat) <= 90 ? c.lat : null, lon = typeof c.lon === "number" && Math.abs(c.lon) <= 180 ? c.lon : null;
-    cams.push({ ...c, kind, source, link, far: c.far === true, at: lat !== null && lon !== null ? ` data-lat="${lat}" data-lon="${lon}"` : "", n: cams.length + 1, field: `cams[${i + 1}]` });
+    cams.push({ ...c, kind, source, link, views, far: c.far === true, at: lat !== null && lon !== null ? ` data-lat="${lat}" data-lon="${lon}"` : "", n: cams.length + 1, field: `cams[${i + 1}]` });
   }
 
   // Instagram posts, saved into content/instagram.json by scripts/sync-feed.mjs. It arrives from
@@ -480,6 +483,7 @@ ${nonprofit()}
     const slider = (name, says, value) => `<label><span>${says}</span><input type="range" name="${name}" min="1" max="${cams.length}" value="${value}"><output></output></label>`;
     const tile = (c) => `<article class="panel cam" id="cam-${c.n}" style="--c:var(--r${((c.n - 1) % 12) + 1})" data-kind="${esc(c.kind)}" data-source="${esc(c.source)}"${c.at}${!preview && (c.n < first || c.n > last) ? " hidden" : ""}>
 <div class="bar">${plate(c)}<span class="bar-note">${esc(c.place)}</span></div>
+${!preview && c.views.length > 1 ? `<div class="views" role="group" aria-label="View">${c.views.map((v, i) => `<button type="button" data-source="${esc(v.source)}" aria-pressed="${i === 0}">${esc(v.name)}</button>`).join("")}</div>` : ""}
 <div class="screen">${screen(c)}</div>
 <p class="cam-foot"><span>${esc([c.note || CAM_SAYS[c.kind], c.credit].filter(Boolean).join(" · "))}</span>${c.kind === "link" ? "" : own(c, "Its own page")}</p>
 </article>`;

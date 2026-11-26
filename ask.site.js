@@ -56,7 +56,8 @@ function checkCams(d) {
     if (!isText(c?.name)) return `${which} needs a "name".`;
     if (!CAM_KIND_NAMES.includes(c.kind)) return `${which}: "kind" must be one of ${CAM_KIND_NAMES.join(", ")}.`;
     if (!blank(c.link) && !webUrl(c.link)) return `${which}: "link" must be a full web address starting with https://, or empty.`;
-    if (c.kind === "link" ? !webUrl(c.link) : !camSource(c.kind, c.source)) return `${which}: ${c.kind === "link" ? 'a "link" camera needs the address of its own page in "link".' : `"source" is not what a "${c.kind}" camera takes. A new camera feed is a job for Kevin: say so, and add it as kind "link" with the address of its own page meanwhile.`}`;
+    if (!blank(c.views) && !(Array.isArray(c.views) && c.kind !== "link" && c.views.every((v) => isText(v?.name) && camSource(c.kind, v.source)))) return `${which}: "views" must be a list, and each view needs a "name" (the words on its button) and a "source" that is what a "${c.kind}" camera takes.`;
+    if (c.kind === "link" ? !webUrl(c.link) : !(c.views?.length || camSource(c.kind, c.source))) return `${which}: ${c.kind === "link" ? 'a "link" camera needs the address of its own page in "link".' : `"source" is not what a "${c.kind}" camera takes. A new camera feed is a job for Kevin: say so, and add it as kind "link" with the address of its own page meanwhile.`}`;
     if (!blank(c.far) && typeof c.far !== "boolean") return `${which}: "far" must be true or false. True keeps the camera off the page until a visitor widens the stretch of coast.`;
     for (const [key, most] of [["lat", 90], ["lon", 180]]) if (!blank(c[key]) && !(typeof c[key] === "number" && Math.abs(c[key]) <= most)) return `${which}: "${key}" must be a number (a map coordinate), or left out.`;
   }

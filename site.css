@@ -254,6 +254,8 @@ h3 { font-size: 1.1rem; font-weight: 800; font-stretch: 110%; line-height: 1.25;
 .screen video { object-fit: cover; }
 .cam[data-kind="image"] .screen { aspect-ratio: auto; min-height: 8rem; }       /* a still keeps its own shape, so its time stamp is never cut off */
 .cam[data-kind="image"] img { height: auto; }
+.views { display: flex; flex-wrap: wrap; gap: 2px; padding: 6px 8px; }      /* a camera with several views: a button for each, over its screen */
+.cams .views button { font-stretch: 80%; }
 .cam-foot { display: flex; justify-content: space-between; gap: .75rem; padding: 6px 10px; font-size: 11px; color: var(--dim); }
 .cam-foot a { flex: none; }
 .cam[data-kind="link"] .screen { aspect-ratio: auto; padding: 1.1rem 10px .5rem; justify-items: start; }   /* plays only on its owner's site: a short tile, in its place in the wall */

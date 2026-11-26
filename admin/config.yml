@@ -233,6 +233,15 @@ collections:
                   - { label: Owner's embedded player, value: frame }
                   - { label: Moving pictures from the camera itself, value: mjpeg }
               - { name: source, label: Feed, widget: string, required: false, hint: "Leave empty for a camera that opens its own page. Otherwise: the picture's https address, the YouTube video id, the State Parks video address, the Pebble Beach player id, or the Windy webcam number. A feed that does not fit is left off the page." }
+              - name: views
+                label: More than one view
+                label_singular: View
+                widget: list
+                required: false
+                hint: "Only for a camera with several pictures from one spot. Each view gets a button on the camera's tile, and the first is shown to start with. Leave empty for an ordinary camera."
+                fields:
+                  - { name: name, label: Words on its button, widget: string }
+                  - { name: source, label: Feed, widget: string, hint: "The same sort of feed as the camera's own: for a still picture, its https address." }
               - { name: link, label: The camera's own page, widget: string, required: false, pattern: ['^https?://\S+$', 'Paste the full address, starting with https://'] }
               - { name: credit, label: Whose camera it is, widget: string, required: false }
               - { name: note, label: Short note, widget: string, required: false, hint: 'Optional. For example "still, every half hour in daylight".' }

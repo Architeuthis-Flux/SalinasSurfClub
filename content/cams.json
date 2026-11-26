@@ -62,26 +62,24 @@
       "far": true
     },
     {
-      "name": "Sunset State Beach, the surf",
+      "name": "Sunset State Beach",
       "place": "Watsonville",
       "kind": "image",
-      "source": "https://cmgp-coastcam.s3-us-west-2.amazonaws.com/cameras/sunset/latest/c1_snap.jpg",
+      "views": [
+        {
+          "name": "The surf",
+          "source": "https://cmgp-coastcam.s3-us-west-2.amazonaws.com/cameras/sunset/latest/c1_snap.jpg"
+        },
+        {
+          "name": "Up the beach",
+          "source": "https://cmgp-coastcam.s3-us-west-2.amazonaws.com/cameras/sunset/latest/c2_snap.jpg"
+        }
+      ],
       "note": "still, every half hour in daylight",
       "credit": "U.S. Geological Survey",
       "link": "https://www.usgs.gov/centers/pcmsc/science/using-video-imagery-study-coastal-change-sunset-state-beach",
       "lat": 36.8733,
       "lon": -121.8209
-    },
-    {
-      "name": "Sunset State Beach, up the beach",
-      "place": "Watsonville",
-      "kind": "image",
-      "source": "https://cmgp-coastcam.s3-us-west-2.amazonaws.com/cameras/sunset/latest/c2_snap.jpg",
-      "note": "still, every half hour in daylight",
-      "credit": "U.S. Geological Survey",
-      "link": "https://www.usgs.gov/centers/pcmsc/science/using-video-imagery-study-coastal-change-sunset-state-beach",
-      "lat": 36.8741,
-      "lon": -121.8213
     },
     {
       "name": "Marina State Beach",

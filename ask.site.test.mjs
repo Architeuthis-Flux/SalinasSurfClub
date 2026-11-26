@@ -76,10 +76,12 @@ assert.equal(checkContent("content/cams.json", cam({ far: true })), "");
 assert.equal(checkContent("content/cams.json", cam({ kind: "link", source: undefined, link: "https://www.surfline.com/x", lat: 36.6, lon: -121.8 })), "");
 assert.equal(checkContent("content/cams.json", cam({ kind: "hls", source: "https://video.parks.ca.gov/Seacliff/Seacliff.stream/playlist.m3u8" })), "");
 assert.equal(checkContent("content/cams.json", '{"title": "Surf cams"}'), "");
+assert.equal(checkContent("content/cams.json", cam({ kind: "image", source: undefined, views: [{ name: "Left", source: "https://pics.example/l.jpg" }, { name: "Right", source: "https://pics.example/r.jpg" }] })), "");
 assert.equal(pageFor("content/cams.json"), "cams.html");
 for (const bad of [{ name: "" }, { kind: "frame" }, { kind: "iframe", source: "https://evil.example/" }, { source: "https://www.youtube.com/watch?v=fVa6-zCBR7A" },
   { kind: "hls", source: "https://evil.example/a.m3u8" }, { kind: "image", source: "http://pics.example/a.jpg" }, { kind: "hdrelay", source: "not-a-player-id" },
-  { kind: "link", source: undefined }, { kind: "link", link: "javascript:alert(1)" }, { link: "javascript:alert(1)" }, { lat: "36.6" }, { lon: 500 }, { far: "yes" }]) {
+  { kind: "link", source: undefined }, { kind: "link", link: "javascript:alert(1)" }, { link: "javascript:alert(1)" }, { lat: "36.6" }, { lon: 500 }, { far: "yes" },
+  { views: "both" }, { kind: "image", views: [{ name: "Left", source: "http://pics.example/l.jpg" }] }, { kind: "image", views: [{ source: "https://pics.example/l.jpg" }] }, { kind: "link", link: "https://x.example/", views: [{ name: "A", source: "https://pics.example/a.jpg" }] }]) {
   assert.notEqual(checkContent("content/cams.json", cam(bad)), "", JSON.stringify(bad));
 }
 assert.notEqual(checkContent("content/cams.json", '{"cams": "all of them"}'), "");

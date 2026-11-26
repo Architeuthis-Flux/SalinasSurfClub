@@ -166,6 +166,7 @@ function selftest() {
       { name: "Plain still", kind: "image", source: "http://pics.example/a.jpg" },
       { name: "Elsewhere", kind: "link", link: "https://www.surfline.example/x", lat: 36.6, lon: -121.8 },
       { name: "After", kind: "frame", source: "https://g1.ipcamlive.com/player/player.php?alias=abc123" },
+      { name: "Twin", kind: "image", views: [{ name: "Left <b>", source: "https://pics.example/l.jpg" }, { name: "Bad", source: "http://pics.example/x.jpg" }, { name: "Right", source: "https://pics.example/r.jpg" }, "nonsense"] },
       { name: "Nowhere", kind: "link", link: "javascript:alert(1)" },
       { name: "Odd", kind: "frame", source: "https://evil.example/" },
       { kind: "image", source: "https://pics.example/nameless.jpg" },
@@ -209,8 +210,12 @@ function selftest() {
   assert.ok(cams.includes('data-kind="hdrelay"') && cams.includes('<img src="https://pics.example/a.jpg"') && cams.includes('href="https://www.surfline.example/x"'));
   assert.ok(cams.indexOf(">Reef<") < cams.indexOf(">Park<") && cams.indexOf(">Still<") < cams.indexOf(">Elsewhere<") && cams.indexOf(">Elsewhere<") < cams.indexOf(">After<"));   // one wall, in the order listed, a camera that only links included
   assert.ok(cams.includes('data-kind="link" data-source="" data-lat="36.6" data-lon="-121.8"') && cams.includes('data-kind="frame" data-source="https://g1.ipcamlive.com/player/player.php?alias=abc123"'));
-  assert.ok(cams.includes('name="from" min="1" max="6" value="2"') && cams.includes('name="to" min="1" max="6" value="6"'));   // the page starts on the stretch that is not marked far
+  assert.ok(cams.includes('name="from" min="1" max="7" value="2"') && cams.includes('name="to" min="1" max="7" value="7"'));   // the page starts on the stretch that is not marked far
   assert.ok(cams.includes('data-lat="36.9" data-lon="-122" hidden>') && cams.split(" hidden>").length === 2 + 2);   // so only the far camera starts hidden (the sliders and the map start hidden too, until cams.js runs)
+  // A camera with several views: one tile, the first view on its screen, a button for each view that fits its kind.
+  assert.ok(cams.includes('data-kind="image" data-source="https://pics.example/l.jpg">') && cams.includes('<img src="https://pics.example/l.jpg"'));
+  assert.ok(cams.includes('<button type="button" data-source="https://pics.example/l.jpg" aria-pressed="true">Left &lt;b&gt;</button><button type="button" data-source="https://pics.example/r.jpg" aria-pressed="false">Right</button></div>'));
+  assert.ok(cams.split('class="views"').length === 2 && !cams.includes("pics.example/x.jpg"));
   for (const gone of ["evil.example", "Bad tube", "Plain still", "Nowhere", "Odd", "nameless", "javascript:"]) assert.ok(!cams.includes(gone), gone);
   assert.ok(cams.includes('<script src="cams.js?v=v1" defer></script>') && cams.includes('href="console.css?v=v1"') && !index.includes("console.css"));
   const empty = buildSite({ files: new Map([["content/site.json", JSON.stringify({ name: "Bare" })]]), hasPhoto: () => false });
@@ -221,6 +226,7 @@ function selftest() {
   assert.ok(preview.pages.get("team.html").includes('src="blob:a.webp"'));
   assert.ok(!preview.pages.get("donate.html").includes("<iframe"));                     // the preview cannot run the form
   assert.ok(!preview.pages.get("cams.html").includes("<script") && preview.pages.get("cams.html").includes('data-edit="content/cams.json#title"'));   // nor the cameras
+  assert.ok(!preview.pages.get("cams.html").includes('class="views"'));                // its buttons would do nothing there
   assert.ok(!preview.pages.get("cams.html").includes('data-lon="-122" hidden'));        // and with no sliders to bring it back, no camera is hidden there
 
   // The real site builds, and nothing it links to is missing.

@@ -99,6 +99,17 @@ document.addEventListener("visibilitychange", () => {   // nobody is looking at 
   for (const tile of tiles) if (STREAMS.has(tile.dataset.kind)) document.hidden ? idle(tile) : tile.hasAttribute("data-visible") && start(tile);
 });
 
+// A camera with more than one view: each button puts its own feed on the tile's screen.
+document.addEventListener("click", (event) => {
+  const button = event.target.closest(".views button");
+  if (!button) return;
+  const tile = button.closest(".cam");
+  for (const b of tile.querySelectorAll(".views button")) b.setAttribute("aria-pressed", b === button);
+  tile.dataset.source = button.dataset.source;
+  if (tile.dataset.kind === "image") tile.querySelector(".screen img").src = fresh(tile.dataset.source);
+  else { idle(tile); start(tile); }
+});
+
 // Stills: ask for the picture again every minute while it is on screen. The owners replace the file
 // (Nepenthe about once a minute, the USGS beach cameras every half hour in daylight).
 setInterval(() => {
