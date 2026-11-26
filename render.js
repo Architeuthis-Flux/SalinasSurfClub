@@ -235,7 +235,7 @@ ${body}
 </div>
 <div class="foot-legal">
 ${nonprofit()}
-<p class="small">&copy; ${year} ${esc(name)}. <a href="admin/">Owner login</a> <a href="guide.html">Editing guide</a></p>
+<p class="small">&copy; ${year} ${esc(name)}. <a href="admin/">Owner login</a> <a href="ask.html">Ask Claude</a> <a href="guide.html">Editing guide</a></p>
 </div>
 </div></footer>
 </body>
