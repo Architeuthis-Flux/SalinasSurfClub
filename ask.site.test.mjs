@@ -51,10 +51,11 @@ for (const folder of ["team", "press", "pages"]) {
 
 // Each kind of bad value is refused.
 const site = (extra) => JSON.stringify({ name: "Salinas Surf Club", ...extra });
-assert.equal(checkContent("content/site.json", site({ email: "admin@salinassurfclub.org", instagram: "salinas_surf_club", facts: [{ title: "A", text: "b" }] })), "");
+assert.equal(checkContent("content/site.json", site({ email: "admin@salinassurfclub.org", instagram: "salinas_surf_club", facts: [{ title: "A", text: "b" }], volunteer_photos: ["/photos/a.webp", "/photos/b c.jpg"] })), "");
 assert.equal(checkContent("content/site.json", site({ email: "", instagram: "" })), "");
 for (const bad of [{ name: " " }, { email: "not an email" }, { email: "a@b" }, { instagram: "@salinas_surf_club" }, { instagram: "https://instagram.com/x" },
-  { headline: ["Surf"] }, { facts: "x" }, { facts: [{ text: "no title" }] }, { day: [{ title: "T" }] }]) {
+  { headline: ["Surf"] }, { facts: "x" }, { facts: [{ text: "no title" }] }, { day: [{ title: "T" }] },
+  { volunteer_photos: "/photos/a.webp" }, { volunteer_photos: ["https://example.org/a.jpg"] }, { volunteer_photos: ["/photos/x/a.webp"] }, { volunteer_photos: [{ src: "/photos/a.webp" }] }]) {
   assert.notEqual(checkContent("content/site.json", site(bad)), "", JSON.stringify(bad));
 }
 // The donation links: only https, only on the service each is named for.
@@ -139,11 +140,12 @@ const person = (title, more = {}) => JSON.stringify({ title, role: "Volunteer", 
 const teamOf = (...people) => new Map(people.map((text, i) => [`content/team/p${i}.json`, text]));
 const board = (n) => Array.from({ length: n }, (_, i) => person("Board " + i, { group: "board" }));
 assert.match(hint(new Map()), /board members/);
-assert.match(hint(new Map(readdirSync("content/team").map((f) => ["content/team/" + f, readFileSync("content/team/" + f, "utf8")]))), /names and titles of the club's board members/);   // the site as it is today
+assert.match(hint(new Map(readdirSync("content/team").map((f) => ["content/team/" + f, readFileSync("content/team/" + f, "utf8")]))), /^You can do things like: /);   // the site as it is today, whatever the club has changed
 assert.match(hint(teamOf(...board(3))), /board members/);
 assert.match(hint(teamOf(...board(4), person("Ana", { photo: "" }), person("Ben", { photo: undefined }))), /drag photos of Ana and Ben onto this chat/);
 assert.match(hint(teamOf(...board(4), ...["A", "B", "C", "D", "E"].map((n) => person(n, { photo: "" })))), /photos of A, B, C, D and the others who have none/);
-assert.match(hint(teamOf(...board(4), person("Cy", { bio: "" }))), /tell me a little about Cy,/);
+assert.match(hint(teamOf(...board(4), person("Cy", { bio: "" }), person("Di", { bio: undefined }))), /a sentence or two about Cy and Di, so everyone/);
+assert.match(hint(teamOf(...board(4).map((p) => p.replace("Shows up every Saturday.", "")))), /Add a new person/);   // nobody has a bio: that is even, so nothing to ask
 assert.match(hint(teamOf(...board(4))), /Add a new person to the team page/);
 assert.match(hint(teamOf(...board(4), "{ not json", "null", "[]", '{"role":"no name"}')), /Add a new person/);     // broken files are skipped, never thrown on
 assert.match(hint(new Map([["content/site.json", "{ not json"], ...teamOf(...board(4))])), /Add a new person/);

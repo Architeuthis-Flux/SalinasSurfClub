@@ -252,12 +252,12 @@ ${nonprofit()}
   const pairs = (items, path, field, tag = "div") =>
     list(items).map((s, i) => `<${tag}${mark(path, `${field}[${i + 1}]`)}><h3>${esc(s.title)}</h3>${paras(s.text)}</${tag}>`).join("");
 
-  const gallery = (shots, title, path = "") => {
+  const gallery = (shots, title, path = "", field = "photos") => {
     const shown = (Array.isArray(shots) ? shots : []).filter((s) => photo(s));
     if (!shown.length) return "";
     // ponytail: tiles load the full 1800px photo (lazily); add build-time thumbnails if galleries get slow
     const items = shown
-      .map((s, i) => `<a href="${photo(s)}"><img src="${photo(s)}" alt="${esc(title)}, photo ${i + 1}" loading="lazy"${path ? mark(path, "photos") : ""}></a>`)
+      .map((s, i) => `<a href="${photo(s)}"><img src="${photo(s)}" alt="${esc(title)}, photo ${i + 1}" loading="lazy"${path ? mark(path, field) : ""}></a>`)
       .join("");
     return `<div class="gallery">${items}</div>`;
   };
@@ -333,10 +333,11 @@ ${role}
 </article>`;
   };
 
-  // Two groups: the board and leadership first, then the volunteers. Anyone not marked "board" is a volunteer.
+  // Two groups: the board and leadership first, then the volunteers. Anyone not marked "board" is a
+  // volunteer. Under them come the club's photos of its volunteers (volunteer_photos), with no text beside them.
   const teamPage = () => {
-    const group = (title, people) => (people.length ? `<section class="team"><div class="wrap"><h2>${title}</h2><div class="members">${people.map(member).join("")}</div></div></section>` : "");
-    const groups = group("Board and leadership", team.filter((p) => p.group === "board")) + group("Volunteers", team.filter((p) => p.group !== "board"));
+    const group = (title, people, more = "") => (people.length || more ? `<section class="team"><div class="wrap"><h2>${title}</h2>${people.length ? `<div class="members">${people.map(member).join("")}</div>` : ""}${more}</div></section>` : "");
+    const groups = group("Board and leadership", team.filter((p) => p.group === "board")) + group("Volunteers", team.filter((p) => p.group !== "board"), gallery(site.volunteer_photos, "Volunteers", SITE, "volunteer_photos"));
     return `${pageHead("Meet the team", "")}
 ${groups || `<section class="team"><div class="wrap"><p class="empty">The team page is on its way.</p></div></section>`}`;
   };

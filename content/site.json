@@ -26,7 +26,7 @@
     },
     {
       "title": "More than surfing",
-      "text": "Hiking and whale watching too, with overnight camping trips in the works."
+      "text": "Hiking and whale watching too."
     }
   ],
   "day_title": "A Saturday with the club",
@@ -53,6 +53,30 @@
     }
   ],
   "feed_title": "Lately on Instagram",
+  "volunteer_photos": [
+    "/photos/volunteers-1.webp",
+    "/photos/team-marissa.webp",
+    "/photos/volunteers-9.webp",
+    "/photos/team-kevin.webp",
+    "/photos/volunteers-11.webp",
+    "/photos/volunteers-3.webp",
+    "/photos/team-burke.webp",
+    "/photos/volunteers-10.webp",
+    "/photos/team-eva.webp",
+    "/photos/volunteers-14.webp",
+    "/photos/team-marc.webp",
+    "/photos/volunteers-2.webp",
+    "/photos/volunteers-5.webp",
+    "/photos/volunteers-12.webp",
+    "/photos/volunteers-4.webp",
+    "/photos/volunteers-15.webp",
+    "/photos/volunteers-8.webp",
+    "/photos/team-travis.webp",
+    "/photos/volunteers-6.webp",
+    "/photos/volunteers-13.webp",
+    "/photos/volunteers-7.webp",
+    "/photos/volunteers-16.webp"
+  ],
   "donate_title": "Keep the stoke alive",
   "donate_text": "Donations cover surfboards, wetsuits, permits, and program costs, so the kids never pay a thing."
 }

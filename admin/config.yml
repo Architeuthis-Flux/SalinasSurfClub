@@ -47,14 +47,15 @@ collections:
       - { name: title, label: Name, widget: string }
       - { name: role, label: Role, widget: string, required: false, hint: 'For example "Founder" or "Volunteer surf instructor".' }
       - { name: photo, label: Photo, widget: image, required: false, hint: "A portrait works best. Shown in a white frame." }
-      - { name: bio, label: About them, widget: text, required: false, hint: "A sentence or two. Leave a blank line to start a new paragraph." }
+      - { name: bio, label: About them, widget: text, required: false, hint: "A sentence or two. The page looks tidiest when everyone has one of about the same length, or nobody does." }
       - name: group
         label: Listed under
         widget: select
-        default: volunteers
+        default: board
+        hint: "Someone listed under Volunteers gets a card with their name. The wall of volunteer photos is in Main pages, Home page and site details."
         options:
-          - { label: Volunteers, value: volunteers }
           - { label: Board and leadership, value: board }
+          - { label: Volunteers, value: volunteers }
       - { name: order, label: Position, widget: number, value_type: int, min: 0, default: 0, required: false, hint: "Lower numbers show first. People with a photo are always listed before people without one." }
 
   - name: press
@@ -146,6 +147,7 @@ collections:
               - { name: title, label: Heading, widget: string }
               - { name: text, label: Text, widget: text }
           - { name: feed_title, label: Heading above the Instagram posts, widget: string, required: false }
+          - { name: volunteer_photos, label: Volunteer photos, widget: image, multiple: true, required: false, hint: "Shown together under Volunteers on the Meet the team page, with no text beside them. Photos of volunteers and students in the water work best." }
           - { name: donate_title, label: Big words in the green band, widget: string, required: false }
           - { name: donate_text, label: Line under them, widget: text, required: false }
 

@@ -32,6 +32,7 @@ function checkSite(d) {
   if (!blank(d.instagram) && !instagramHandle(d.instagram)) return '"instagram" must be the Instagram user name, without the @, or empty.';
   if (!blank(d.headline) && typeof d.headline !== "string") return '"headline" must be text, one line per row.';
   for (const key of ["facts", "day"]) if (!blank(d[key]) && !isPairs(d[key])) return `"${key}" must be a list, and each item needs a "title" and a "text".`;
+  if (!blank(d.volunteer_photos) && !(Array.isArray(d.volunteer_photos) && d.volunteer_photos.every((p) => typeof p === "string" && /^\/photos\/[^/]+$/.test(p)))) return '"volunteer_photos" must be a list of photos on the site, each written as "/photos/<file name>".';
   return "";
 }
 
@@ -74,10 +75,13 @@ export function hint(files) {
   // ponytail: "the board has been given" means more people under Board and leadership than the three
   // found in public records when the site was made. If the real board is three people, lower the 4.
   if (team.filter((p) => p.group === "board").length < 4) return `You can do things like: paste the names and titles of the club's board members, and I will add them all to the team page and then help with their photos. ${ANYTHING}`;
+  const few = (names) => (names.length > 4 ? names.slice(0, 4).join(", ") + " and the others who have none" : listed(names));
   const bare = team.filter((p) => !isText(p.photo)).map((p) => p.title);
-  if (bare.length) return `You can do things like: drag photos of ${bare.length > 4 ? bare.slice(0, 4).join(", ") + " and the others who have none" : listed(bare)} onto this chat and say who is who. ${ANYTHING}`;
+  if (bare.length) return `You can do things like: drag photos of ${few(bare)} onto this chat and say who is who. ${ANYTHING}`;
+  // The cards sit side by side, so a few words about some people and none about the others looks
+  // uneven. Nobody having any is fine; otherwise ask for everyone still missing, at once.
   const quiet = team.filter((p) => !isText(p.bio)).map((p) => p.title);
-  if (quiet.length) return `You can do things like: tell me a little about ${quiet[0]}, and I will write it up for the team page. ${ANYTHING}`;
+  if (quiet.length && quiet.length < team.length) return `You can do things like: tell me a sentence or two about ${few(quiet)}, so everyone on the team page has a few words. ${ANYTHING}`;
   return `You can do things like: “Add a new person to the team page.” ${ANYTHING}`;
 }
 

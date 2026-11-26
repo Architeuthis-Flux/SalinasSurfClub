@@ -148,6 +148,11 @@ h3 { font-size: 1.1rem; font-weight: 800; font-stretch: 110%; line-height: 1.25;
 @media (min-width: 58rem) { .story .wrap:has(.snap) { grid-template-columns: 1.3fr 1fr; } }
 .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: .75rem; }
 .gallery img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.members + .gallery { margin-top: 2.5rem; }
+/* The volunteers' photos are a mix of upright and wide, so they stack in columns at their own shape instead of being cropped to one. */
+.team .gallery { display: block; columns: 9.5rem 4; column-gap: .75rem; }
+.team .gallery a { display: block; margin-bottom: .75rem; break-inside: avoid; }
+.team .gallery img { aspect-ratio: auto; }
 
 /* ---------- team ---------- */
 .members { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 2.5rem 2rem; align-items: start; }

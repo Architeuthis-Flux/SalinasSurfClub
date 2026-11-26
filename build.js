@@ -122,7 +122,7 @@ function selftest() {
 
   // A made-up site: ordering, the menu, a reserved name, a broken file, a missing photo, bad links, escaping.
   const files = new Map(Object.entries({
-    "content/site.json": JSON.stringify({ name: "Test & Club", headline: "One\nTwo <i>", email: "a@b.org", instagram: "test_club", mission: "First.\n\nSecond.", facts: [{ title: "F", text: "x\n\ny" }], day: [{ title: "D1", text: "z" }], feed_title: "Feed", tax_id: "12-3456789" }),
+    "content/site.json": JSON.stringify({ name: "Test & Club", headline: "One\nTwo <i>", email: "a@b.org", instagram: "test_club", mission: "First.\n\nSecond.", facts: [{ title: "F", text: "x\n\ny" }], day: [{ title: "D1", text: "z" }], feed_title: "Feed", tax_id: "12-3456789", volunteer_photos: ["/photos/v.webp", "/photos/gone-v.jpg", "https://evil.example/v.jpg", 7] }),
     "content/about.json": JSON.stringify({ title: "About us", body: "Story <b>" }),
     "content/donate.json": JSON.stringify({ title: "Give", zeffy_url: "https://www.zeffy.com/en-US/donation-form/test", venmo_url: "https://evil.example/venmo", zelle_url: "https://enroll.zellepay.com/qr-codes?data=x", zelle_to: "a@b.org" }),
     "content/contact.json": "{ not json",
@@ -158,6 +158,7 @@ function selftest() {
   assert.ok(team.indexOf("Board and leadership") < team.indexOf(">Chair<") && team.indexOf(">Chair<") < team.indexOf(">Volunteers<"));   // the board first
   assert.ok(team.indexOf(">Volunteers<") < team.indexOf("Second &lt;i&gt;") && team.indexOf("Second &lt;i&gt;") < team.indexOf(">First<"));   // then volunteers, the one with a photo first
   assert.ok(!team.includes("gone.jpg"));
+  assert.ok(team.indexOf(">First<") < team.indexOf('<div class="gallery"><a href="photos/v.webp"><img src="photos/v.webp" alt="Volunteers, photo 1"') && !team.includes("gone-v") && !team.includes("evil.example"));   // then the volunteers' photos, with no names
   const press = made.pages.get("press.html");
   assert.ok(press.indexOf(">New<") < press.indexOf(">Old<"));                           // newest first
   assert.ok(press.includes("October 1, 2026") && press.includes("Watch the film") && !press.includes("javascript:"));
