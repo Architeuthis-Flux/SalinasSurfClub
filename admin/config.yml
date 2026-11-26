@@ -200,3 +200,42 @@ collections:
         fields:
           - { name: title, label: Page title, widget: string }
           - { name: intro, label: Opening line, widget: text, required: false, hint: "The email address and Instagram button come from the Home page and site details form." }
+
+      - name: cams
+        label: Surf cams page
+        file: content/cams.json
+        fields:
+          - { name: title, label: Page title, widget: string }
+          - { name: intro, label: Opening line, widget: string, required: false }
+          - { name: map_token, label: Apple Maps token, widget: string, required: false, hint: "Kevin sets this. It is what makes the map appear. Leave it as it is." }
+          - name: cams
+            label: Cameras
+            label_singular: Camera
+            widget: list
+            required: false
+            summary: "{{name}} ({{place}})"
+            hint: "Shown in this order, north to south. You can rename, reorder or remove one. Adding a camera that plays on this page needs its feed details, which is a job for Kevin; a camera that just opens its owner's page only needs a name and a link."
+            fields:
+              - { name: name, label: Name, widget: string }
+              - { name: place, label: Where it is, widget: string, required: false, hint: 'A town or a beach, for example "Marina".' }
+              - name: kind
+                label: How it shows
+                widget: select
+                default: link
+                hint: 'Pick "Opens its own page" unless Kevin has given you the feed.'
+                options:
+                  - { label: Opens its own page, value: link }
+                  - { label: Still picture that refreshes, value: image }
+                  - { label: YouTube live video, value: youtube }
+                  - { label: California State Parks video, value: hls }
+                  - { label: Pebble Beach player, value: hdrelay }
+                  - { label: Windy.com webcam, value: windy }
+                  - { label: Owner's embedded player, value: frame }
+                  - { label: Moving pictures from the camera itself, value: mjpeg }
+              - { name: source, label: Feed, widget: string, required: false, hint: "Leave empty for a camera that opens its own page. Otherwise: the picture's https address, the YouTube video id, the State Parks video address, the Pebble Beach player id, or the Windy webcam number. A feed that does not fit is left off the page." }
+              - { name: link, label: The camera's own page, widget: string, required: false, pattern: ['^https?://\S+$', 'Paste the full address, starting with https://'] }
+              - { name: credit, label: Whose camera it is, widget: string, required: false }
+              - { name: note, label: Short note, widget: string, required: false, hint: 'Optional. For example "still, every half hour in daylight".' }
+              - { name: far, label: Hidden to start with, widget: boolean, default: false, required: false, hint: "Switch on for a camera outside the stretch of coast most people check. Visitors bring it in with the From and To sliders." }
+              - { name: lat, label: Map position north, widget: number, value_type: float, required: false, hint: "Optional. With both numbers the camera gets a pin on the map." }
+              - { name: lon, label: Map position east, widget: number, value_type: float, required: false, hint: "A negative number here: California is west." }

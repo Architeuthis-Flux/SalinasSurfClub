@@ -15,14 +15,14 @@ import { cpSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, 
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildSite, cssUrl, donateUrl, esc, instagramHandle, longDate, num, paras, rich, slugify, webUrl, zeffyEmbed } from "./render.js";
+import { buildSite, camSource, cssUrl, donateUrl, esc, instagramHandle, longDate, num, paras, rich, slugify, webUrl, zeffyEmbed } from "./render.js";
 
 const SRC = dirname(fileURLToPath(import.meta.url));
 const ASSETS = ["admin", "fonts", "guide.html", "receipt.html", "receipt.js", "ask.html", "ask.js", "ask.site.js", "ask.site.css",
-  "render.js", "site.css", "logo.png"];   // published as they are; each must exist
+  "render.js", "site.css", "console.css", "cams.js", "logo.png"];   // published as they are; each must exist
 const OPTIONAL = ["photos", "guide"];     // folders that exist only once they hold a file (git keeps no empty folders)
 const DESIGN = "content/design.css";      // design overrides, published as design.css next to site.css
-const PAGES = ["site", "about", "donate", "contact", "instagram"];   // content/<name>.json
+const PAGES = ["site", "about", "donate", "contact", "instagram", "cams"];   // content/<name>.json
 const FOLDERS = ["team", "press", "pages"];                          // content/<name>/*.json
 
 function readContent() {
@@ -44,7 +44,7 @@ function readContent() {
 // Hash of the stylesheets, appended as ?v= so a changed file is never served stale.
 function version() {
   const hash = createHash("sha1");
-  for (const name of ["site.css", DESIGN]) hash.update(readFileSync(join(SRC, name)));
+  for (const name of ["site.css", DESIGN, "console.css", "cams.js"]) hash.update(readFileSync(join(SRC, name)));
   return hash.digest("hex").slice(0, 8);
 }
 
@@ -120,6 +120,23 @@ function selftest() {
   assert.equal(cssUrl('photos/a b").x{y}\\.jpg'), "photos/a%20b%22%29.x{y}%5c.jpg");
   assert.deepEqual([instagramHandle("salinas_surf_club"), instagramHandle("a/b"), instagramHandle(""), instagramHandle(null)], ["salinas_surf_club", "", "", ""]);
 
+  // A camera's feed: each kind takes one thing, and only something that looks exactly like it.
+  assert.equal(camSource("youtube", "fVa6-zCBR7A"), "fVa6-zCBR7A");
+  assert.equal(camSource("hdrelay", "5a85e702-a78f-4e15-b452-173a6cb2baa1"), "5a85e702-a78f-4e15-b452-173a6cb2baa1");
+  assert.equal(camSource("windy", " 1296343777 "), "1296343777");
+  assert.equal(camSource("hls", "https://video.parks.ca.gov/Seacliff/Seacliff.stream/playlist.m3u8"), "https://video.parks.ca.gov/Seacliff/Seacliff.stream/playlist.m3u8");
+  assert.equal(camSource("image", "https://files.example/b.jpg"), "https://files.example/b.jpg");
+  assert.equal(camSource("mjpeg", "https://cam.example/axis-cgi/mjpg/video.cgi?resolution=960x540&fps=4"), "https://cam.example/axis-cgi/mjpg/video.cgi?resolution=960x540&fps=4");
+  assert.equal(camSource("frame", "https://g1.ipcamlive.com/player/player.php?alias=abc123"), "https://g1.ipcamlive.com/player/player.php?alias=abc123");
+  assert.equal(camSource("frame", "https://watch.hdrelay.io/player.html?cam=x&sig=y"), "https://watch.hdrelay.io/player.html?cam=x&sig=y");
+  assert.equal(camSource("frame", "https://portal.hdontap.com/s/embed/?stream=x-CUST"), "https://portal.hdontap.com/s/embed/?stream=x-CUST");
+  for (const [kind, bad] of [
+    ["youtube", "https://www.youtube.com/watch?v=fVa6-zCBR7A"], ["youtube", 'x"><script>'], ["hdrelay", "5a85e702"], ["windy", "12a"],
+    ["hls", "https://evil.example/a.m3u8"], ["hls", "https://video.parks.ca.gov.evil.example/a.m3u8"], ["hls", "http://video.parks.ca.gov/a.m3u8"], ["hls", "https://video.parks.ca.gov/a.html"],
+    ["image", "http://files.example/b.jpg"], ["image", "javascript:alert(1)"], ["mjpeg", "https://cam.example/evil.cgi"], ["mjpeg", "http://cam.example/axis-cgi/mjpg/video.cgi"],
+    ["frame", "https://evil.example/player.html"], ["frame", "https://watch.hdrelay.io/other.html"], ["frame", "https://watch.hdrelay.io.evil.example/player.html"], ["frame", "https://portal.hdontap.com/account"], ["frame", "https://www.surfline.com/surf-report/x/1"], ["frame", "http://portal.hdontap.com/s/embed/?stream=x"], ["frame", "https://constructor/player.html"], ["link", "https://x.example/"], ["frame", "https://x.example/"], ["constructor", "x"], ["youtube", null],
+  ]) assert.equal(camSource(kind, bad), "", `${kind} ${bad}`);
+
   // A made-up site: ordering, the menu, a reserved name, a broken file, a missing photo, bad links, escaping.
   const files = new Map(Object.entries({
     "content/site.json": JSON.stringify({ name: "Test & Club", headline: "One\nTwo <i>", email: "a@b.org", instagram: "test_club", mission: "First.\n\nSecond.", facts: [{ title: "F", text: "x\n\ny" }], day: [{ title: "D1", text: "z" }], feed_title: "Feed", tax_id: "12-3456789", volunteer_photos: ["/photos/v.webp", "/photos/gone-v.jpg", "https://evil.example/v.jpg", 7] }),
@@ -139,14 +156,29 @@ function selftest() {
     "content/press/old.json": JSON.stringify({ title: "Old", date: "2020-01-14", kind: "Film", url: "https://youtu.be/abcDEF_1234", outlet: "Out" }),
     "content/press/new.json": JSON.stringify({ title: "New", date: "2026-10-01", kind: "Article", url: "javascript:alert(1)", cover: "http://plain.example/x.jpg" }),
     "content/press/mid.json": JSON.stringify({ title: "Mid", date: "2022-12-12", cover: "https://pics.example/y.jpg?a=1&b=2" }),
+    "content/cams.json": JSON.stringify({ title: "Cams <b>", intro: "Look first.", map_token: 'tok"en', cams: [
+      { name: "Reef", place: "North <i>", kind: "youtube", source: "abcDEF_1234", lat: 36.9, lon: -122, link: "https://owner.example/reef", credit: "Aq", far: true },
+      { name: "Bad tube", kind: "youtube", source: "https://evil.example/x" },
+      { name: "Park", kind: "hls", source: "https://video.parks.ca.gov/A/B.stream/playlist.m3u8", lat: "north", lon: 500 },
+      { name: "Evil stream", kind: "hls", source: "https://evil.example/a.m3u8" },
+      { name: "Golf", kind: "hdrelay", source: "5a85e702-a78f-4e15-b452-173a6cb2baa1" },
+      { name: "Still", kind: "image", source: "https://pics.example/a.jpg" },
+      { name: "Plain still", kind: "image", source: "http://pics.example/a.jpg" },
+      { name: "Elsewhere", kind: "link", link: "https://www.surfline.example/x", lat: 36.6, lon: -121.8 },
+      { name: "After", kind: "frame", source: "https://g1.ipcamlive.com/player/player.php?alias=abc123" },
+      { name: "Nowhere", kind: "link", link: "javascript:alert(1)" },
+      { name: "Odd", kind: "frame", source: "https://evil.example/" },
+      { kind: "image", source: "https://pics.example/nameless.jpg" },
+      "nonsense",
+    ] }),
     "content/pages/sponsors.json": JSON.stringify({ title: "Our Sponsors", body: '<p><img src="/photos/a.webp"></p>' }),
     "content/pages/hidden.json": JSON.stringify({ title: "Hidden", menu: false }),
     "content/pages/donate.json": JSON.stringify({ title: "Would overwrite the Donate page" }),
   }));
   const warnings = [];
   const made = buildSite({ files, hasPhoto: (name) => !name.startsWith("gone"), version: "v1", year: 2026, warn: (m) => warnings.push(m) });
-  assert.deepEqual([...made.pages.keys()], ["index.html", "about.html", "team.html", "press.html", "donate.html", "contact.html", "hidden.html", "sponsors.html"]);
-  assert.equal(warnings.length, 3);                                       // contact.json, team/broken.json, the page named donate
+  assert.deepEqual([...made.pages.keys()], ["index.html", "about.html", "team.html", "press.html", "donate.html", "contact.html", "cams.html", "hidden.html", "sponsors.html"]);
+  assert.equal(warnings.length, 9);                                       // contact.json, team/broken.json, the page named donate, six cameras that could not be shown
   const index = made.pages.get("index.html");
   assert.ok(index.includes("<span>One</span> <span>Two &lt;i&gt;</span>"));
   assert.ok(index.includes('<a href="sponsors.html">Our Sponsors</a>') && !index.includes("hidden.html"));
@@ -169,12 +201,27 @@ function selftest() {
   assert.ok(donate.includes("enroll.zellepay.com") && !donate.includes("evil.example") && donate.includes("Tax ID: 12-3456789"));
   assert.ok(made.pages.get("contact.html").includes('href="mailto:a@b.org"'));         // its own file is broken; the page still stands
   assert.ok(made.pages.get("sponsors.html").includes('<img src="photos/a.webp">'));
+  const cams = made.pages.get("cams.html");
+  assert.ok(index.includes('<a href="cams.html">Surf cams</a>'));
+  assert.ok(cams.includes("Cams &lt;b&gt;") && cams.includes("North &lt;i&gt;") && cams.includes('data-map-token="tok&quot;en"'));
+  assert.ok(cams.includes('data-kind="youtube" data-source="abcDEF_1234" data-lat="36.9" data-lon="-122"'));
+  assert.ok(cams.includes('data-kind="hls" data-source="https://video.parks.ca.gov/A/B.stream/playlist.m3u8">'));   // a place that is not a real coordinate gets no pin
+  assert.ok(cams.includes('data-kind="hdrelay"') && cams.includes('<img src="https://pics.example/a.jpg"') && cams.includes('href="https://www.surfline.example/x"'));
+  assert.ok(cams.indexOf(">Reef<") < cams.indexOf(">Park<") && cams.indexOf(">Still<") < cams.indexOf(">Elsewhere<") && cams.indexOf(">Elsewhere<") < cams.indexOf(">After<"));   // one wall, in the order listed, a camera that only links included
+  assert.ok(cams.includes('data-kind="link" data-source="" data-lat="36.6" data-lon="-121.8"') && cams.includes('data-kind="frame" data-source="https://g1.ipcamlive.com/player/player.php?alias=abc123"'));
+  assert.ok(cams.includes('name="from" min="1" max="6" value="2"') && cams.includes('name="to" min="1" max="6" value="6"'));   // the page starts on the stretch that is not marked far
+  assert.ok(cams.includes('data-lat="36.9" data-lon="-122" hidden>') && cams.split(" hidden>").length === 2 + 2);   // so only the far camera starts hidden (the sliders and the map start hidden too, until cams.js runs)
+  for (const gone of ["evil.example", "Bad tube", "Plain still", "Nowhere", "Odd", "nameless", "javascript:"]) assert.ok(!cams.includes(gone), gone);
+  assert.ok(cams.includes('<script src="cams.js?v=v1" defer></script>') && cams.includes('href="console.css?v=v1"') && !index.includes("console.css"));
   const empty = buildSite({ files: new Map([["content/site.json", JSON.stringify({ name: "Bare" })]]), hasPhoto: () => false });
   assert.ok(!empty.pages.get("index.html").includes("team.html") && !empty.pages.get("index.html").includes('class="feed"'));
+  assert.ok(!empty.pages.has("cams.html") && !empty.pages.get("index.html").includes("cams.html"));   // no cameras, no page
   const preview = buildSite({ files, hasPhoto: () => true, photoUrl: (name) => "blob:" + name, preview: true });
   assert.ok(preview.pages.get("index.html").includes('data-edit="content/site.json#headline"'));
   assert.ok(preview.pages.get("team.html").includes('src="blob:a.webp"'));
   assert.ok(!preview.pages.get("donate.html").includes("<iframe"));                     // the preview cannot run the form
+  assert.ok(!preview.pages.get("cams.html").includes("<script") && preview.pages.get("cams.html").includes('data-edit="content/cams.json#title"'));   // nor the cameras
+  assert.ok(!preview.pages.get("cams.html").includes('data-lon="-122" hidden'));        // and with no sliders to bring it back, no camera is hidden there
 
   // The real site builds, and nothing it links to is missing.
   const tmp = mkdtempSync(join(tmpdir(), "surfclub-"));

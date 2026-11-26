@@ -2,7 +2,7 @@
 // is the same on every site and comes from the friend-sites kit; do not edit those here.
 // Checked by ask.site.test.mjs (npm test).
 
-import { buildSite, donateUrl, instagramHandle, webUrl, RESERVED } from "./render.js";
+import { buildSite, camSource, donateUrl, instagramHandle, webUrl, CAM_KIND_NAMES, RESERVED } from "./render.js";
 
 // One file per fixed page: path -> [what the "Ready to publish" list calls it, the preview page that shows it].
 const SINGLE = new Map([
@@ -10,13 +10,14 @@ const SINGLE = new Map([
   ["content/about.json", ["About page", "about.html"]],
   ["content/donate.json", ["Donate page", "donate.html"]],
   ["content/contact.json", ["Contact page", "contact.html"]],
+  ["content/cams.json", ["Surf cams page", "cams.html"]],
 ]);
 const FEED = "content/instagram.json";                 // filled in by the daily Instagram job: readable, never writable here
 const ENTRY = /^content\/(team|press|pages)\/[a-z0-9]+(-[a-z0-9]+)*\.json$/;
 const KINDS = { team: "Team", press: "Press", pages: "Page" };
 const folderOf = (path) => path.split("/")[1];
 const slugOf = (path) => path.split("/").pop().replace(/\.json$/, "");
-const PAGE_TITLES = { "index.html": "Home page", "about.html": "About", "team.html": "Team", "press.html": "Press", "donate.html": "Donate", "contact.html": "Contact" };
+const PAGE_TITLES = { "index.html": "Home page", "about.html": "About", "team.html": "Team", "press.html": "Press", "donate.html": "Donate", "contact.html": "Contact", "cams.html": "Surf cams" };
 
 /* ---- what a content file must look like. Each check gives "" or the problem, in words Claude
    can act on. Strictest where a wrong value would send a donor's money somewhere else. */
@@ -41,6 +42,24 @@ function checkDonate(d) {
     if (!blank(d[key]) && !donateUrl(key, d[key])) return `"${key}" must be an https:// address on ${where}, or empty. This is where donations go, so it is checked. If the club really has a new address there, ask the person to confirm it.`;
   }
   if (!blank(d.ways) && !isPairs(d.ways)) return '"ways" must be a list, and each item needs a "title" and a "text".';
+  return "";
+}
+
+// The surf cams. A camera's feed is loaded into the club's own page, so it is held to exactly what
+// its kind takes (render.js, camSource); anything else is refused here before it can be published.
+function checkCams(d) {
+  if (!blank(d.map_token) && typeof d.map_token !== "string") return '"map_token" must be text, or empty. Kevin sets it; leave it as it is.';
+  if (blank(d.cams)) return "";
+  if (!Array.isArray(d.cams)) return '"cams" must be a list of cameras.';
+  for (const [i, c] of d.cams.entries()) {
+    const which = `Camera ${i + 1}${isText(c?.name) ? ` (${c.name})` : ""}`;
+    if (!isText(c?.name)) return `${which} needs a "name".`;
+    if (!CAM_KIND_NAMES.includes(c.kind)) return `${which}: "kind" must be one of ${CAM_KIND_NAMES.join(", ")}.`;
+    if (!blank(c.link) && !webUrl(c.link)) return `${which}: "link" must be a full web address starting with https://, or empty.`;
+    if (c.kind === "link" ? !webUrl(c.link) : !camSource(c.kind, c.source)) return `${which}: ${c.kind === "link" ? 'a "link" camera needs the address of its own page in "link".' : `"source" is not what a "${c.kind}" camera takes. A new camera feed is a job for Kevin: say so, and add it as kind "link" with the address of its own page meanwhile.`}`;
+    if (!blank(c.far) && typeof c.far !== "boolean") return `${which}: "far" must be true or false. True keeps the camera off the page until a visitor widens the stretch of coast.`;
+    for (const [key, most] of [["lat", 90], ["lon", 180]]) if (!blank(c[key]) && !(typeof c[key] === "number" && Math.abs(c[key]) <= most)) return `${which}: "${key}" must be a number (a map coordinate), or left out.`;
+  }
   return "";
 }
 
@@ -99,7 +118,7 @@ export default {
   design: "content/design.css",         // design overrides, published as design.css after site.css
   readOnly: "site.css",                 // the main stylesheet: Claude may read it, never change it
   photos: "photos/",                    // where photos live in the repo
-  pathHelp: "content/site.json, content/about.json, content/donate.json, content/contact.json, content/team/<slug>.json, content/press/<slug>.json, content/pages/<slug>.json",
+  pathHelp: "content/site.json, content/about.json, content/donate.json, content/contact.json, content/cams.json, content/team/<slug>.json, content/press/<slug>.json, content/pages/<slug>.json",
   isContent: (path) => SINGLE.has(path) || path === FEED || ENTRY.test(path),
   checkPath(path, { reading, deleting }) {
     if (path === FEED) return reading ? "" : "The Instagram posts are filled in from Instagram by themselves, once a day. They cannot be changed here.";
@@ -110,6 +129,7 @@ export default {
   checkContent(path, data) {
     if (path === "content/site.json") return checkSite(data);
     if (path === "content/donate.json") return checkDonate(data);
+    if (path === "content/cams.json") return checkCams(data);
     if (ENTRY.test(path)) return checkEntry(folderOf(path), data);
     return "";
   },

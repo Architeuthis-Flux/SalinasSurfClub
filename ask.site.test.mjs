@@ -1,14 +1,14 @@
 // Self-check for what Claude may touch on this site:  npm test
 // The rules are in ask.site.js (this site's) and ask.js (the same on every site).
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { checkPath, checkContent, label, pageFor, photoRefs, uniqueName, DESIGN, TOOL_NAMES } from "./ask.js";
 import { hint } from "./ask.site.js";
 
 const FEED = "content/instagram.json";
 
 // Content files, and the design file, can be read and written.
-for (const ok of ["content/site.json", "content/about.json", "content/donate.json", "content/contact.json",
+for (const ok of ["content/site.json", "content/about.json", "content/donate.json", "content/contact.json", "content/cams.json",
   "content/team/jeff-smallwood.json", "content/press/lessons-in-the-waves.json", "content/pages/our-sponsors.json", "content/team/a1.json", DESIGN]) {
   assert.equal(checkPath(ok), "", ok);
   assert.equal(checkPath(ok, { reading: true }), "", ok);
@@ -32,16 +32,16 @@ for (const bad of [
   assert.notEqual(checkPath(bad, { reading: true }), "", "read " + String(bad));
 }
 // An extra page cannot take a name the site itself uses.
-for (const taken of ["index", "about", "team", "press", "donate", "contact", "guide", "ask"]) assert.notEqual(checkPath(`content/pages/${taken}.json`), "", taken);
+for (const taken of ["index", "about", "team", "press", "donate", "contact", "cams", "guide", "ask"]) assert.notEqual(checkPath(`content/pages/${taken}.json`), "", taken);
 assert.equal(checkPath("content/team/about.json"), "");                       // a person's file is not a page, so no clash
 // The fixed pages and the design file cannot be deleted; entries can.
-for (const fixed of ["content/site.json", "content/about.json", "content/donate.json", "content/contact.json", DESIGN]) assert.notEqual(checkPath(fixed, { deleting: true }), "", fixed);
+for (const fixed of ["content/site.json", "content/about.json", "content/donate.json", "content/contact.json", "content/cams.json", DESIGN]) assert.notEqual(checkPath(fixed, { deleting: true }), "", fixed);
 for (const entry of ["content/team/jeff-smallwood.json", "content/press/x.json", "content/pages/our-sponsors.json"]) assert.equal(checkPath(entry, { deleting: true }), "", entry);
 
 // The content files as they are in the repo pass their own checks.
 const here = (path) => new URL(path, import.meta.url);
-for (const name of ["site", "about", "donate", "contact"]) assert.equal(checkContent(`content/${name}.json`, readFileSync(here(`content/${name}.json`), "utf8")), "", name);
-for (const folder of ["team", "press", "pages"]) {
+for (const name of ["site", "about", "donate", "contact", "cams"]) assert.equal(checkContent(`content/${name}.json`, readFileSync(here(`content/${name}.json`), "utf8")), "", name);
+for (const folder of ["team", "press", "pages"].filter((f) => existsSync(here(`content/${f}/`)))) {   // git keeps no empty folder, so "pages" exists only once the club adds a page
   for (const name of readdirSync(here(`content/${folder}/`)).filter((n) => n.endsWith(".json"))) {
     const path = `content/${folder}/${name}`;
     assert.equal(checkPath(path), "", path);
@@ -70,6 +70,20 @@ for (const bad of [
 ]) {
   assert.notEqual(checkContent("content/donate.json", give(bad)), "", JSON.stringify(bad));
 }
+// The surf cams: a feed must be exactly what its kind takes, so nothing else can be put in a frame on the club's page.
+const cam = (extra) => JSON.stringify({ title: "Surf cams", cams: [{ name: "Reef", kind: "youtube", source: "fVa6-zCBR7A", ...extra }] });
+assert.equal(checkContent("content/cams.json", cam({ far: true })), "");
+assert.equal(checkContent("content/cams.json", cam({ kind: "link", source: undefined, link: "https://www.surfline.com/x", lat: 36.6, lon: -121.8 })), "");
+assert.equal(checkContent("content/cams.json", cam({ kind: "hls", source: "https://video.parks.ca.gov/Seacliff/Seacliff.stream/playlist.m3u8" })), "");
+assert.equal(checkContent("content/cams.json", '{"title": "Surf cams"}'), "");
+assert.equal(pageFor("content/cams.json"), "cams.html");
+for (const bad of [{ name: "" }, { kind: "frame" }, { kind: "iframe", source: "https://evil.example/" }, { source: "https://www.youtube.com/watch?v=fVa6-zCBR7A" },
+  { kind: "hls", source: "https://evil.example/a.m3u8" }, { kind: "image", source: "http://pics.example/a.jpg" }, { kind: "hdrelay", source: "not-a-player-id" },
+  { kind: "link", source: undefined }, { kind: "link", link: "javascript:alert(1)" }, { link: "javascript:alert(1)" }, { lat: "36.6" }, { lon: 500 }, { far: "yes" }]) {
+  assert.notEqual(checkContent("content/cams.json", cam(bad)), "", JSON.stringify(bad));
+}
+assert.notEqual(checkContent("content/cams.json", '{"cams": "all of them"}'), "");
+assert.notEqual(checkContent("content/cams.json", '{"cams": ["Reef"]}'), "");
 // Entries.
 assert.equal(checkContent("content/team/x.json", '{"title": "X", "order": 2}'), "");
 assert.notEqual(checkContent("content/team/x.json", '{"title": "  "}'), "");

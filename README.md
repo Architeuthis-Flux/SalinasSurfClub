@@ -11,7 +11,7 @@ node build.js _site      # build the site into _site/
 
 - `content/` holds everything the club can change: `site.json` (home page and details used everywhere), `about.json`, `donate.json`, `contact.json`, one file per person in `team/`, one per article or film in `press/`, one per extra page in `pages/`. `design.css` holds design changes made through Ask Claude.
 - `render.js` turns the content into pages. `build.js` runs it in Node; the Ask Claude page runs the same file in the browser to preview a change. Keep it one renderer.
-- `site.css` is the look. `fonts/archivo.woff2` is Archivo (SIL Open Font License, see `fonts/OFL.txt`).
+- `site.css` is the look. The Surf cams page (`content/cams.json`, `cams.js`) also wears `console.css`, a copy of the console look from Kevin's slopswap repo written by its `.tools/console_copy.py`; change the look there and copy again, never here. `fonts/archivo.woff2` is Archivo (SIL Open Font License, see `fonts/OFL.txt`).
 - `admin/` is the editor (Sveltia CMS): forms over the content files. `ask.html` is Ask Claude. `guide.html` explains both to the club.
 - `ask.html` and `ask.js` are copies from Kevin's friend-sites kit. Do not edit them here. This site's own rules are in `ask.site.js`.
 - `photos/` holds uploaded photos, and Instagram pictures saved as `ig-<post id>.jpg`.

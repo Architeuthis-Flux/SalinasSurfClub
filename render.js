@@ -4,7 +4,7 @@
 // page runs it in the browser to show changes before they are published. It only turns text into
 // text: no files, no network, nothing that differs between the two.
 
-export const RESERVED = new Set(["index", "about", "team", "press", "donate", "contact", "guide", "ask"]);   // page names the site itself uses
+export const RESERVED = new Set(["index", "about", "team", "press", "donate", "contact", "cams", "guide", "ask"]);   // page names the site itself uses
 
 /* ------------------------------------------------------------------ small helpers */
 
@@ -86,6 +86,34 @@ export function zeffyEmbed(value) {
   return m ? `https://www.zeffy.com/embed/donation-form/${m[1]}` : "";
 }
 
+// A camera's feed, by kind. Each kind takes one thing, and only something that looks exactly like it
+// is used, so a mistyped or hostile entry can never put some other address in a frame on the club's
+// site. Anything else comes back empty and the camera is left out. Used here and by ask.site.js.
+// A "link" camera has no feed: it only opens the owner's own page.
+const HLS_HOSTS = ["video.parks.ca.gov"];   // ponytail: one host today; add a host here when a new video feed needs it
+const httpsUrl = (value) => (webUrl(value).startsWith("https://") ? webUrl(value) : "");
+// An owner's own player or page, shown in a frame: host -> where on it a camera lives. Whether it
+// shows is up to that service. HDOnTap refuses every site the camera's owner has not had added to
+// its list, so those frames stay empty (a note shows through) until the owner asks HDOnTap to add
+// salinassurfclub.org. Surfline is not here on purpose: its page does load in a frame, but it
+// brings Surfline's advertising with it, which the club has no say over, so those cameras are links.
+const FRAME_HOSTS = { "watch.hdrelay.io": "/player.html", "g1.ipcamlive.com": "/player/player.php", "portal.hdontap.com": "/s/embed" };
+const pathOf = (url) => (url ? new URL(url) : { hostname: "", pathname: "" });
+const CAM_KINDS = {
+  youtube: (s) => (/^[A-Za-z0-9_-]{11}$/.test(s) ? s : ""),                                   // the video's id
+  hdrelay: (s) => (/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(s) ? s : ""),           // the player id from the owner's page
+  windy: (s) => (/^\d{6,12}$/.test(s) ? s : ""),                                              // the webcam's number on windy.com
+  hls: (s) => (httpsUrl(s) && HLS_HOSTS.includes(new URL(s).hostname) && new URL(s).pathname.endsWith(".m3u8") ? httpsUrl(s) : ""),
+  image: (s) => httpsUrl(s),                                                                  // a still picture that the owner keeps replacing
+  mjpeg: (s) => (pathOf(httpsUrl(s)).pathname.endsWith("/axis-cgi/mjpg/video.cgi") ? httpsUrl(s) : ""),   // moving pictures straight from an Axis camera
+  frame: (s) => (Object.hasOwn(FRAME_HOSTS, pathOf(httpsUrl(s)).hostname) && pathOf(httpsUrl(s)).pathname.startsWith(FRAME_HOSTS[pathOf(httpsUrl(s)).hostname]) ? httpsUrl(s) : ""),
+};
+export const CAM_KIND_NAMES = [...Object.keys(CAM_KINDS), "link"];
+export function camSource(kind, source) {
+  return Object.hasOwn(CAM_KINDS, kind) ? CAM_KINDS[kind](String(source ?? "").trim()) : "";
+}
+const CAM_SAYS = { youtube: "live", hdrelay: "live", hls: "live", mjpeg: "live", frame: "live", windy: "time-lapse", image: "still", link: "plays on its own site" };
+
 // An address about to sit inside CSS url("..."): the few characters that could end the string early are percent-encoded.
 export const cssUrl = (url) => String(url).replace(/["'\\()\s]/g, (c) => "%" + c.charCodeAt(0).toString(16).padStart(2, "0"));
 
@@ -153,9 +181,9 @@ export function buildSite({ files, hasPhoto, photoUrl = (name) => "photos/" + na
     return out;
   };
 
-  const SITE = "content/site.json", ABOUT = "content/about.json", DONATE = "content/donate.json", CONTACT = "content/contact.json";
+  const SITE = "content/site.json", ABOUT = "content/about.json", DONATE = "content/donate.json", CONTACT = "content/contact.json", CAMS = "content/cams.json";
   const site = JSON.parse(files.get(SITE));
-  const about = one(ABOUT), donate = one(DONATE), contact = one(CONTACT);
+  const about = one(ABOUT), donate = one(DONATE), contact = one(CONTACT), camsFile = one(CAMS);
   const name = site.name ?? "";
   const handle = instagramHandle(site.instagram);
   const instagram = handle ? `https://www.instagram.com/${handle}/` : "";
@@ -177,6 +205,21 @@ export function buildSite({ files, hasPhoto, photoUrl = (name) => "photos/" + na
   }
   const menu = extraPages.filter((g) => ("menu" in g ? g.menu : true)).map((g) => [g.slug + ".html", g.title]);
 
+  // The surf cameras, in the order the club lists them (north to south). Each keeps its place in
+  // that list as its number, which is also the number on its map pin. One that cannot be shown
+  // (no name, a feed that is not what its kind takes, no page to open) is left out, with a warning.
+  const cams = [];
+  for (const [i, c] of list(camsFile.cams).entries()) {
+    const kind = String(c.kind ?? ""), link = webUrl(c.link);
+    const source = kind === "link" ? "" : camSource(kind, c.source);
+    if (!c.name || !(kind === "link" ? link : source)) {
+      warn(`camera ${i + 1} skipped${c.name ? ` (${c.name})` : ""}: it needs a name and ${kind === "link" ? "a link" : "a feed that fits its kind"}`);
+      continue;
+    }
+    const lat = typeof c.lat === "number" && Math.abs(c.lat) <= 90 ? c.lat : null, lon = typeof c.lon === "number" && Math.abs(c.lon) <= 180 ? c.lon : null;
+    cams.push({ ...c, kind, source, link, far: c.far === true, at: lat !== null && lon !== null ? ` data-lat="${lat}" data-lon="${lon}"` : "", n: cams.length + 1, field: `cams[${i + 1}]` });
+  }
+
   // Instagram posts, saved into content/instagram.json by scripts/sync-feed.mjs. It arrives from
   // outside, so each post is checked: a real Instagram address, and a picture that exists.
   const posts = list(one("content/instagram.json").posts)
@@ -190,11 +233,12 @@ export function buildSite({ files, hasPhoto, photoUrl = (name) => "photos/" + na
     return site.nonprofit || id ? `<p class="nonprofit"><span${mark(SITE, "nonprofit")}>${esc(site.nonprofit)}</span>${id}</p>` : "";
   };
 
-  const layout = (title, desc, body, here = "") => {
+  const layout = (title, desc, body, here = "", head = "") => {
     const links = [
       ["about.html", "About"],
       ...(team.length ? [["team.html", "Team"]] : []),
       ...(press.length ? [["press.html", "Press"]] : []),
+      ...(cams.length ? [["cams.html", "Surf cams"]] : []),
       ...menu,
       ["contact.html", "Contact"],
     ];
@@ -215,7 +259,7 @@ export function buildSite({ files, hasPhoto, photoUrl = (name) => "photos/" + na
 <link rel="preload" href="fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="site.css?v=${version}">
 <link rel="stylesheet" href="design.css?v=${version}">
-</head>
+${head}</head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="top"><div class="wrap">
@@ -415,6 +459,46 @@ ${nonprofit()}
 </div></section>`;
   };
 
+  // Every camera on one page, in the order the club lists them: a wall of screens, a drawn map of the
+  // coast with each camera marked (cams.js draws it; pick a mark to jump to that camera), and two
+  // sliders that choose the stretch of coast to show (From and To; To north of From runs the wall
+  // south to north). With a map token there is an Apple map as well. A camera marked "far" is outside the stretch the page starts with. A camera whose owner's service will not play on another site is still in its place in
+  // the wall, as a link to its own page. The look is the console look from Kevin's slopswap
+  // pages (console.css, a copy) in the club's colours (site.css). cams.js starts each screen as it
+  // comes into view and puts the pins on the map; without it the stills and every link still work.
+  // The Ask Claude preview cannot run the feeds, so it shows a note in their place, as for the donation form.
+  const camsPage = () => {
+    const plate = (c) => `<span class="plate" role="heading" aria-level="2"><b>${String(c.n).padStart(2, "0")}</b><span${mark(CAMS, c.field)}>${esc(c.name)}</span></span>`;
+    const own = (c, words) => (c.link ? `<a href="${esc(c.link)}" rel="noopener">${words}</a>` : "");
+    const screen = (c) => {
+      if (c.kind === "link") return `<p>${own(c, "Watch on its own site")}</p>`;
+      if (c.kind === "image") return `<img src="${esc(c.source)}" alt="${esc(c.name)}, the latest picture" loading="lazy">`;
+      if (preview) return `<p>This camera plays here on the real site.</p>`;
+      return `<p>${own(c, "Watch on its own site") || "Loading"}</p>`;
+    };
+    const near = cams.filter((c) => !c.far), first = (near[0] ?? cams[0]).n, last = (near.at(-1) ?? cams.at(-1)).n;
+    const slider = (name, says, value) => `<label><span>${says}</span><input type="range" name="${name}" min="1" max="${cams.length}" value="${value}"><output></output></label>`;
+    const tile = (c) => `<article class="panel cam" id="cam-${c.n}" style="--c:var(--r${((c.n - 1) % 12) + 1})" data-kind="${esc(c.kind)}" data-source="${esc(c.source)}"${c.at}${!preview && (c.n < first || c.n > last) ? " hidden" : ""}>
+<div class="bar">${plate(c)}<span class="bar-note">${esc(c.place)}</span></div>
+<div class="screen">${screen(c)}</div>
+<p class="cam-foot"><span>${esc([c.note || CAM_SAYS[c.kind], c.credit].filter(Boolean).join(" · "))}</span>${c.kind === "link" ? "" : own(c, "Its own page")}</p>
+</article>`;
+    return `<section class="console cams"${camsFile.map_token ? ` data-map-token="${esc(camsFile.map_token)}"` : ""}><div class="wrap">
+<header class="cams-head"><h1${mark(CAMS, "title")}>${esc(camsFile.title || "Surf cams")}</h1>${camsFile.intro ? `<p class="lede"${mark(CAMS, "intro")}>${esc(camsFile.intro)}</p>` : ""}</header>
+<div class="cams-grid">
+<div class="cams-side">
+<form class="panel cam-range" hidden><div class="bar"><span class="plate" role="heading" aria-level="2"><b>00</b>Stretch of coast</span><span class="bar-note"></span></div>
+<div class="range"><div class="coast"></div>
+<div class="sliders"><p><span>North</span><span>South</span></p>${slider("from", "From", first)}${slider("to", "To", last)}
+<p class="credit">Coast outline &copy; <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a> contributors</p></div></div></form>
+<div class="panel cam-map" id="cam-map" hidden><div class="bar"><span class="plate" role="heading" aria-level="2"><b>+</b>Map</span><span class="bar-note">Pick a pin to jump to its camera</span></div><div class="map"></div></div>
+</div>
+<div class="wall">${cams.map(tile).join("")}</div>
+<noscript><style>.cams .cam[hidden] { display: flex; }</style></noscript>
+</div>
+</div></section>${preview ? "" : `\n<script src="cams.js?v=${version}" defer></script>`}`;
+  };
+
   const contentPage = (g) => {
     const body = g.body ? `<div class="prose"${mark(g.path, "body")}>${rich(g.body)}</div>` : "";
     return `${pageHead(g.title, g.intro, g.path)}
@@ -434,6 +518,7 @@ ${gallery(g.photos, g.title, g.path)}
   pages.set("press.html", layout(`Press | ${name}`, `${name} in the news.`, pressPage(), "press.html"));
   pages.set("donate.html", layout(`${donate.title || "Donate"} | ${name}`, donate.intro || desc, donatePage(), "donate.html"));
   pages.set("contact.html", layout(`${contact.title || "Contact"} | ${name}`, contact.intro || desc, contactPage(), "contact.html"));
+  if (cams.length) pages.set("cams.html", layout(`${camsFile.title || "Surf cams"} | ${name}`, camsFile.intro || `Live cameras around Monterey Bay, from ${name}.`, camsPage(), "cams.html", `<link rel="stylesheet" href="console.css?v=${version}">\n`));
   for (const g of extraPages) {
     pages.set(g.slug + ".html", layout(`${g.title} | ${name}`, g.intro || g.title, contentPage(g), g.slug + ".html"));
   }

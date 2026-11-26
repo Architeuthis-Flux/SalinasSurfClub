@@ -1,0 +1,230 @@
+{
+  "title": "Surf cams",
+  "intro": "Check the water before you drive out. Cameras around Monterey Bay, in order from north to south.",
+  "map_token": "",
+  "cams": [
+    {
+      "name": "Santa Cruz Wharf and Main Beach",
+      "place": "Santa Cruz",
+      "kind": "image",
+      "source": "https://cmgp-coastcam.s3-us-west-2.amazonaws.com/cameras/dreaminn/latest/c1_snap.jpg",
+      "note": "still, every half hour in daylight",
+      "credit": "U.S. Geological Survey",
+      "link": "https://www.usgs.gov/centers/pcmsc/science/using-video-imagery-study-coastal-change-santa-cruz-beaches",
+      "lat": 36.9618,
+      "lon": -122.0261,
+      "far": true
+    },
+    {
+      "name": "Cowells and West Cliff",
+      "place": "Santa Cruz",
+      "kind": "image",
+      "source": "https://cmgp-coastcam.s3-us-west-2.amazonaws.com/cameras/dreaminn/latest/c2_snap.jpg",
+      "note": "still, every half hour in daylight",
+      "credit": "U.S. Geological Survey",
+      "link": "https://www.usgs.gov/centers/pcmsc/science/using-video-imagery-study-coastal-change-santa-cruz-beaches",
+      "lat": 36.9614,
+      "lon": -122.0268,
+      "far": true
+    },
+    {
+      "name": "Santa Cruz Harbor",
+      "place": "Santa Cruz",
+      "kind": "frame",
+      "source": "https://watch.hdrelay.io/player.html?cam=cam_santa_cruz_harbor_1791323462007&profile=p_mux81vn1a3dc&sig=8e1ebf421a1ff615847b0fa1&exp=1822862970343&dom=",
+      "credit": "Santa Cruz Port District",
+      "link": "https://santacruzharbor.org/santa-cruz-harbor-webcam",
+      "lat": 36.964,
+      "lon": -122.002,
+      "far": true
+    },
+    {
+      "name": "Seacliff State Beach",
+      "place": "Aptos",
+      "kind": "hls",
+      "source": "https://video.parks.ca.gov/Seacliff/Seacliff.stream/playlist.m3u8",
+      "credit": "California State Parks",
+      "link": "https://www.parks.ca.gov/?page_id=31191",
+      "lat": 36.9691,
+      "lon": -121.9069,
+      "far": true
+    },
+    {
+      "name": "Seascape Beach Resort",
+      "place": "Aptos",
+      "kind": "frame",
+      "source": "https://portal.hdontap.com/s/embed/?stream=seascape_ttv-CUST",
+      "note": "shows here once its owner allows this site",
+      "credit": "Seascape Beach Resort, on HDOnTap",
+      "link": "https://hdontap.com/stream/257733/monterey-bays-seascape-beach-resort-live-webcam/",
+      "lat": 36.9494,
+      "lon": -121.8764,
+      "far": true
+    },
+    {
+      "name": "Sunset State Beach, the surf",
+      "place": "Watsonville",
+      "kind": "image",
+      "source": "https://cmgp-coastcam.s3-us-west-2.amazonaws.com/cameras/sunset/latest/c1_snap.jpg",
+      "note": "still, every half hour in daylight",
+      "credit": "U.S. Geological Survey",
+      "link": "https://www.usgs.gov/centers/pcmsc/science/using-video-imagery-study-coastal-change-sunset-state-beach",
+      "lat": 36.8733,
+      "lon": -121.8209
+    },
+    {
+      "name": "Sunset State Beach, up the beach",
+      "place": "Watsonville",
+      "kind": "image",
+      "source": "https://cmgp-coastcam.s3-us-west-2.amazonaws.com/cameras/sunset/latest/c2_snap.jpg",
+      "note": "still, every half hour in daylight",
+      "credit": "U.S. Geological Survey",
+      "link": "https://www.usgs.gov/centers/pcmsc/science/using-video-imagery-study-coastal-change-sunset-state-beach",
+      "lat": 36.8741,
+      "lon": -121.8213
+    },
+    {
+      "name": "Marina State Beach",
+      "place": "Marina",
+      "kind": "link",
+      "credit": "Surfline",
+      "link": "https://www.surfline.com/surf-report/marina-state-beach/5842041f4e65fad6a7708941",
+      "lat": 36.6987,
+      "lon": -121.8092
+    },
+    {
+      "name": "Monterey Wall",
+      "place": "Monterey",
+      "kind": "link",
+      "credit": "Surfline",
+      "link": "https://www.surfline.com/surf-report/monterey-wall/626b384c491aa93ef5684303"
+    },
+    {
+      "name": "Port of Monterey",
+      "place": "Monterey",
+      "kind": "frame",
+      "source": "https://portal.hdontap.com/s/embed/?stream=portola_ttv-DMS",
+      "note": "shows here once its owner allows this site",
+      "credit": "Portola Hotel & Spa",
+      "link": "https://www.portolahotel.com/our-hotel/webcam",
+      "lat": 36.6016,
+      "lon": -121.8945
+    },
+    {
+      "name": "Cannery Row",
+      "place": "Monterey",
+      "kind": "frame",
+      "source": "https://portal.hdontap.com/s/embed/?stream=taste-of-monterey_cannery-row-CUST",
+      "note": "shows here once its owner allows this site",
+      "credit": "A Taste of Monterey, on HDOnTap",
+      "link": "https://hdontap.com/stream/129341/montereys-cannery-row-live-webcam/",
+      "lat": 36.6164,
+      "lon": -121.8999
+    },
+    {
+      "name": "Monterey Bay, from the Aquarium",
+      "place": "Monterey",
+      "kind": "youtube",
+      "source": "fVa6-zCBR7A",
+      "credit": "Monterey Bay Aquarium",
+      "link": "https://www.montereybayaquarium.org/cams-videos/live-cams/monterey-bay-cam",
+      "lat": 36.6181,
+      "lon": -121.9017
+    },
+    {
+      "name": "Fanshell Beach and Cypress Point",
+      "place": "17-Mile Drive",
+      "kind": "mjpeg",
+      "source": "https://rachleff.org/axis-cgi/mjpg/video.cgi?resolution=960x540&fps=4&compression=50",
+      "credit": "rachleff.org",
+      "link": "https://rachleff.org/camera/index.html#/video",
+      "lat": 36.5845,
+      "lon": -121.9715
+    },
+    {
+      "name": "Pebble Beach, 18th green",
+      "place": "Stillwater Cove",
+      "kind": "hdrelay",
+      "source": "5a85e702-a78f-4e15-b452-173a6cb2baa1",
+      "note": "live, press play",
+      "credit": "Pebble Beach Company",
+      "link": "https://www.pebblebeach.com/golf/pebble-beach-golf-links/live-golf-cams/the-18th-green-at-pebble-beach-golf-links/",
+      "lat": 36.5677,
+      "lon": -121.9489
+    },
+    {
+      "name": "Pebble Beach, 17th green",
+      "place": "Stillwater Cove",
+      "kind": "hdrelay",
+      "source": "126252b2-59ad-4bde-9580-0ac26491e551",
+      "note": "live, press play",
+      "credit": "Pebble Beach Company",
+      "link": "https://www.pebblebeach.com/golf/pebble-beach-golf-links/live-golf-cams/the-17th-green-at-pebble-beach-golf-links/",
+      "lat": 36.5655,
+      "lon": -121.9462
+    },
+    {
+      "name": "Stillwater Cove",
+      "place": "Pebble Beach",
+      "kind": "frame",
+      "source": "https://g1.ipcamlive.com/player/player.php?alias=608db9eca8dee&autoplay=1",
+      "credit": "Stillwater Yacht Club",
+      "link": "https://www.sycpb.org/live-cam",
+      "lat": 36.5668,
+      "lon": -121.9437
+    },
+    {
+      "name": "Carmel Bay",
+      "place": "Carmel-by-the-Sea",
+      "kind": "mjpeg",
+      "source": "https://cam.carmelclam.com/axis-cgi/mjpg/video.cgi?resolution=960x540&fps=4&compression=50",
+      "credit": "Carmel ClamCam",
+      "link": "https://carmelclam.com/",
+      "lat": 36.5512,
+      "lon": -121.9294
+    },
+    {
+      "name": "Whalers Cove, Point Lobos",
+      "place": "Carmel",
+      "kind": "hls",
+      "source": "https://video.parks.ca.gov/PointLobos/WhalersCove.stream/playlist.m3u8",
+      "credit": "California State Parks",
+      "link": "https://www.parks.ca.gov/?page_id=31194",
+      "lat": 36.5206,
+      "lon": -121.9395
+    },
+    {
+      "name": "Tickle Pink Inn",
+      "place": "Carmel Highlands",
+      "kind": "frame",
+      "source": "https://portal.hdontap.com/s/embed/?stream=ticklepink_ttv-CUST",
+      "note": "shows here once its owner allows this site",
+      "credit": "Tickle Pink Inn",
+      "link": "https://www.ticklepinkinn.com/live-web-cam.htm",
+      "lat": 36.5002,
+      "lon": -121.9369
+    },
+    {
+      "name": "Post Ranch Inn",
+      "place": "Big Sur",
+      "kind": "frame",
+      "source": "https://portal.hdontap.com/s/embed/?stream=post_ranch_inn-big_sir-ptz_cam-CUST",
+      "note": "shows here once its owner allows this site",
+      "credit": "Post Ranch Inn",
+      "link": "https://postranchinn.com/live-webcam/",
+      "lat": 36.2272,
+      "lon": -121.7643
+    },
+    {
+      "name": "Nepenthe",
+      "place": "Big Sur",
+      "kind": "image",
+      "source": "https://files.nepenthebigsur.com/camera/b.jpg",
+      "note": "still, about once a minute",
+      "credit": "Nepenthe",
+      "link": "https://www.nepenthe.com/live-weather-cam",
+      "lat": 36.2218,
+      "lon": -121.7597
+    }
+  ]
+}
