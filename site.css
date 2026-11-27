@@ -143,6 +143,9 @@ h3 { font-size: 1.1rem; font-weight: 800; font-stretch: 110%; line-height: 1.25;
 .prose h3 { margin-top: 1.6em; font-size: 1.25rem; }
 .prose a { color: var(--sea); font-weight: 600; }
 .prose blockquote { margin-inline: 0; padding-left: 1.25rem; border-left: 5px solid var(--green); }
+.prose table { width: 100%; border-collapse: collapse; font-size: 1rem; }
+.prose th, .prose td { padding: .5rem 1rem .5rem 0; border-bottom: 1px solid var(--sand); text-align: left; vertical-align: top; }
+.prose figcaption { margin-top: .4rem; color: var(--muted); font-size: .9rem; }
 /* A photo in a white frame, set down a little crooked, like the prints in the club's posts. */
 .snap { justify-self: start; max-width: 26rem; padding: .7rem .7rem 2.6rem; background: var(--paper); box-shadow: 0 .5rem 1.5rem rgba(5, 42, 51, .18); rotate: 2deg; }
 @media (min-width: 58rem) { .story .wrap:has(.snap) { grid-template-columns: 1.3fr 1fr; } }

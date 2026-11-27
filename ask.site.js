@@ -37,12 +37,30 @@ function checkSite(d) {
   return "";
 }
 
-function checkDonate(d) {
+// Where donations go may only change to something the person typed themselves in this conversation.
+// Claude can read web pages, and nothing it read there, or in a file, may be able to move the club's
+// money. `said` is what the person has typed and `before` is the file as it is now; with neither (a
+// file checked as it stands, as the tests do) there is nothing to compare.
+const MONEY = [...Object.keys(DONATE_WHERE), "zelle_to"];
+const bare = (value) => String(value).trim().replace(/^https?:\/\/(www\.)?/i, "").replace(/\/+$/, "");
+// The whole value, as a word of its own: a longer link the person typed does not vouch for a shorter one inside it.
+const typed = (said, value) => new RegExp(`(^|[\\s(<\\["'])(https?://)?(www\\.)?${bare(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/*(?=$|[\\s)>\\]"',;!?]|\\.(\\s|$))`, "i").test(said);
+function fromThePerson(d, { said, before } = {}) {
+  if (typeof said !== "string") return "";
+  let was = {};
+  try {
+    was = JSON.parse(before) ?? {};
+  } catch { /* a new file, or one that cannot be read: everything in it counts as changed */ }
+  const moved = MONEY.find((key) => !blank(d[key]) && d[key] !== was[key] && !typed(said, d[key]));
+  return moved ? `"${moved}" decides where donations go, so it can only be set to something the person typed in this conversation themselves. If you did not mean to change it, write it back exactly as it is in the file. Otherwise ask them to paste the club's own ${moved === "zelle_to" ? "Zelle email or phone number" : "link"} here, then use it exactly as they typed it.` : "";
+}
+
+function checkDonate(d, context) {
   for (const [key, where] of Object.entries(DONATE_WHERE)) {
     if (!blank(d[key]) && !donateUrl(key, d[key])) return `"${key}" must be an https:// address on ${where}, or empty. This is where donations go, so it is checked. If the club really has a new address there, ask the person to confirm it.`;
   }
   if (!blank(d.ways) && !isPairs(d.ways)) return '"ways" must be a list, and each item needs a "title" and a "text".';
-  return "";
+  return fromThePerson(d, context);
 }
 
 // The surf cams. A camera's feed is loaded into the club's own page, so it is held to exactly what
@@ -64,11 +82,36 @@ function checkCams(d) {
   return "";
 }
 
+// An extra page's body is the one field published as HTML. A web page Claude read could tell it to
+// put a script there, and a script on the club's own address can reach the sign-ins the editors
+// keep in their browsers. So HTML written here is held to plain formatting: these tags, a link's
+// href, a picture's src and alt, and nothing else. Whatever does not match exactly is refused,
+// which is what makes a pattern enough. (The editor's own text box is a person typing: not checked here.)
+const BODY_TAGS = "p br hr h2 h3 h4 ul ol li strong em b i u s a blockquote img figure figcaption table thead tbody tr th td".split(" ");
+const BODY_ATTRS = { a: ["href"], img: ["src", "alt"] };
+const bodyLink = (v) => /^([a-z0-9]+(-[a-z0-9]+)*\.html)?(#[\w-]+)?$/.test(v) ? v : /^mailto:[^\s@]+@[^\s@]+$/.test(v) ? v : webUrl(v);
+function checkBody(html) {
+  if (typeof html !== "string") return '"body" must be text: simple HTML.';
+  for (const [tag] of html.matchAll(/<[^>]*>?/g)) {
+    const no = (why) => `"body" cannot hold ${tag.slice(0, 60)} because ${why}. Only simple HTML goes there: ${BODY_TAGS.join(", ")}. A link takes only href, a picture takes only src and alt, and nothing else takes anything.`;
+    const [, closing, name, attrs] = /^<(\/?)([a-z][a-z0-9]*)((?:\s+[a-z]+="[^"<>]*")*)\s*\/?>$/.exec(tag) ?? [];
+    if (!name) return no("it is not a plain tag (a bare < in the words is written &lt;)");
+    if (!BODY_TAGS.includes(name)) return no("that tag is not allowed");
+    for (const [, key, value] of attrs.matchAll(/\s+([a-z]+)="([^"<>]*)"/g)) {
+      if (closing || !BODY_ATTRS[name]?.includes(key)) return no(`"${key}" is not allowed there`);
+      if (key === "href" && !bodyLink(value)) return no("a link goes to a page of this site, a full https:// address or a mailto: address");
+      if (key === "src" && !/^\/photos\/[^/]+$/.test(value)) return no('a picture must be a photo on the site, written "/photos/<file name>"');
+    }
+  }
+  return "";
+}
+
 function checkEntry(folder, d) {
   if (!isText(d.title)) return folder === "team" ? 'A team member needs a "title": their name.' : 'This needs a "title".';
   if (folder === "team" && !blank(d.order) && !(typeof d.order === "number" && Number.isFinite(d.order) && d.order >= 0)) return '"order" must be a number, 0 or more. Lower shows first.';
   if (folder === "team" && !blank(d.group) && !["board", "volunteers"].includes(d.group)) return '"group" must be "board" or "volunteers".';
   if (folder === "team" && !blank(d.link) && !personLink(d.link)) return '"link" must be a page of this site, like "cams.html", or a full web address starting with https://, or empty.';
+  if (folder === "pages" && !blank(d.body) && checkBody(d.body)) return checkBody(d.body);
   if (folder === "press") {
     if (!blank(d.url) && !webUrl(d.url)) return '"url" must be a full web address starting with https://, or empty.';
     if (!blank(d.date) && !/^\d{4}(-\d{2}-\d{2})?$/.test(d.date)) return '"date" must look like 2026-10-01, or just the year.';
@@ -128,9 +171,9 @@ export default {
     if (folderOf(path) === "pages" && RESERVED.has(slugOf(path))) return `The name "${slugOf(path)}" is used by the site itself. Pick another.`;
     return "";
   },
-  checkContent(path, data) {
+  checkContent(path, data, context) {
     if (path === "content/site.json") return checkSite(data);
-    if (path === "content/donate.json") return checkDonate(data);
+    if (path === "content/donate.json") return checkDonate(data, context);
     if (path === "content/cams.json") return checkCams(data);
     if (ENTRY.test(path)) return checkEntry(folderOf(path), data);
     return "";

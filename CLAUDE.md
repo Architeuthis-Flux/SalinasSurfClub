@@ -11,6 +11,7 @@ The website of Salinas Surf Club, a nonprofit. Kevin built it and is a club memb
 - A push to `main` publishes the site about a minute later. Push to `main` only when Kevin has said to.
 - The deploy workflow only builds. Do not add tests to it: a dead link or a bad content file must never stop a save from going live. The Instagram steps in it must never fail a deploy either.
 - The donation links are where people's money goes. Do not loosen their checks.
+- Claude on the Ask Claude page can read the web, so a web page can try to talk it into things. Two checks in `ask.site.js` hold whatever it is told: an extra page's body takes only plain formatting (`checkBody`), and a donation link only changes to one the person typed (`fromThePerson`). Do not loosen either.
 - The repo and the site are public. Only real facts about the club go on the site: no made-up names, roles, numbers, sponsors or quotes, and no placeholder entries. Never commit private contact details, and never name a student without the club saying a parent is fine with it.
 - Do not paste the text of news articles into the site. A press entry is a headline, a link and one line in the club's own words.
 - A photo committed straight to `photos/` goes up as it is. Make it a WebP no more than 1800px on its longest side, with the phone's location data removed, first.

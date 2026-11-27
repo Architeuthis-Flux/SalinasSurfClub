@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { checkPath, checkContent, label, pageFor, photoRefs, uniqueName, DESIGN, TOOL_NAMES } from "./ask.js";
 import { hint } from "./ask.site.js";
+import { buildSite } from "./render.js";
 
 const FEED = "content/instagram.json";
 
@@ -108,6 +109,60 @@ assert.notEqual(checkContent("content/press/x.json", '{"title": "X", "cover": "h
 assert.notEqual(checkContent("content/press/x.json", '{"title": "X", "cover": "javascript:alert(1)"}'), "");
 assert.notEqual(checkContent("content/press/x.json", '{"title": "X", "cover": "/photos/../build.js"}'), "");
 assert.notEqual(checkContent("content/pages/x.json", "{}"), "");
+// An extra page's body: plain formatting only. Claude reads web pages, and nothing it read may put a script on the site.
+const page = (body) => JSON.stringify({ title: "Our Sponsors", body });
+for (const body of ["", "Thank you.", "<p>Thank you to <strong>everyone</strong>.<br>See you <em>Saturday</em>.</p>", '<h2>Sponsors</h2><ul><li><a href="https://example.org/a?b=1&amp;c=2">One</a></li><li><a href="about.html">About us</a></li><li><a href="#top">Top</a></li><li><a href="mailto:admin@salinassurfclub.org">Write to us</a></li></ul>',
+  '<figure><img src="/photos/a.webp" alt="Kids on the sand"><figcaption>Saturday</figcaption></figure>', "<table>\n<thead><tr><th>Day</th></tr></thead><tbody><tr><td>Saturday</td></tr></tbody></table><hr />", "<p>Under 12 &lt; free</p>"]) {
+  assert.equal(checkContent("content/pages/x.json", page(body)), "", body);
+}
+for (const body of ["<script>alert(1)</script>", '<script src="https://evil.example/x.js"></script>', "<SCRIPT>alert(1)</SCRIPT>", "<p>a</p><script", '<img src="/photos/a.webp" onerror="alert(1)">', '<p onclick="alert(1)">a</p>',
+  '<a href="javascript:alert(1)">a</a>', '<a href="java\tscript:alert(1)">a</a>', '<a href="&#106;avascript:alert(1)">a</a>', '<a href="data:text/html,x">a</a>', '<a href="">a</a>', "<a href='about.html'>a</a>", "<a href=about.html>a</a>",
+  '<a href="about.html" target="_blank">a</a>', '<img src="https://evil.example/a.png">', '<img src="/photos/../admin/x.png">', '<iframe src="https://evil.example/"></iframe>', '<p style="position:fixed">a</p>', "<style>p { color: red }</style>",
+  '<svg onload="alert(1)"></svg>', "<object></object>", '<form action="https://evil.example/"><input></form>', "<!-- <script>alert(1)</script> -->", "kids < 12 > 3", "<p", '<p>a</p >b<', '<meta http-equiv="refresh" content="0;url=https://evil.example/">', 7]) {
+  assert.notEqual(checkContent("content/pages/x.json", page(body)), "", String(body));
+}
+// Where donations go can only be set to something the person typed themselves. Without a conversation there is nothing to compare.
+const donateNow = readFileSync(here("content/donate.json"), "utf8");
+const donate = (change) => JSON.stringify({ ...JSON.parse(donateNow), ...change });
+const told = (said) => ({ said, before: donateNow });
+assert.equal(checkContent("content/donate.json", donate({ intro: "New words." }), told("Change the opening line")), "");                    // nothing about money changed
+assert.equal(checkContent("content/donate.json", donate({ venmo_url: "https://venmo.com/u/SurfClubSalinas" }), told("Our new Venmo is venmo.com/u/SurfClubSalinas please")), "");
+assert.equal(checkContent("content/donate.json", donate({ venmo_url: "https://venmo.com/u/SurfClubSalinas" }), told("use https://www.venmo.com/u/surfclubsalinas/")), "");
+assert.equal(checkContent("content/donate.json", donate({ zelle_to: "give@salinassurfclub.org" }), told("Zelle goes to give@salinassurfclub.org now")), "");
+assert.equal(checkContent("content/donate.json", donate({ venmo_url: "https://venmo.com/u/SurfClubSalinas" }), told("It is (venmo.com/u/SurfClubSalinas).")), "");
+assert.equal(checkContent("content/donate.json", donate({ zelle_to: "(831) 555-0100" }), told("Zelle to (831) 555-0100, thanks")), "");
+assert.match(checkContent("content/donate.json", donate({ venmo_url: "https://venmo.com/u/SurfClub" }), told("Our Venmo is venmo.com/u/SurfClubSalinas")), /typed in this conversation/);   // a shorter handle inside the one they typed
+assert.match(checkContent("content/donate.json", donate({ venmo_url: "https://venmo.com/u/SurfClubSalinas" }), told("Our Venmo is notvenmo.com/u/SurfClubSalinas2")), /typed in this conversation/);
+assert.match(checkContent("content/donate.json", donate({ venmo_url: "https://venmo.com/u/salinassurfclub" }), told("tidy the page")), /write it back exactly/);        // only the spelling of the link changed
+assert.equal(checkContent("content/donate.json", donate({ venmo_url: "" }), told("Take Venmo off the page")), "");                                // removing a link sends money nowhere
+assert.match(checkContent("content/donate.json", donate({ venmo_url: "https://venmo.com/u/someone-else" }), told("Find our Venmo on the web and fix the link")), /typed in this conversation/);
+assert.match(checkContent("content/donate.json", donate({ zelle_to: "someone@else.example" }), told("")), /Zelle email or phone/);
+assert.match(checkContent("content/donate.json", donate({ zeffy_url: "https://www.zeffy.com/en-US/donation-form/another" }), { said: "update the form", before: null }), /typed in this conversation/);
+assert.match(checkContent("content/donate.json", donate({}), { said: "make a donate page", before: null }), /typed in this conversation/);          // a brand-new file: every link in it is new
+assert.equal(checkContent("content/donate.json", donate({ venmo_url: "https://venmo.com/u/someone-else" })), "");                                // checked as it stands
+// The body check is only enough if an extra page's body is the ONLY field published as HTML. So put a
+// tag into every text field of every content file, one at a time, build, and look for it on a page.
+const all = new Map([["content/pages/probe.json", JSON.stringify({ title: "Probe", intro: "A line", body: "<p>ok</p>", photos: ["/photos/logo.webp"] })]]);
+for (const name of readdirSync(here("content/"), { recursive: true }).filter((n) => n.endsWith(".json"))) all.set("content/" + name, readFileSync(here("content/" + name), "utf8"));
+const onDisk = new Set(readdirSync(here("photos/")));
+const leaves = (value, at = []) => (typeof value === "string" ? [at] : value && typeof value === "object" ? Object.entries(value).flatMap(([key, inner]) => leaves(inner, [...at, key])) : []);
+let probed = 0;
+for (const [file, text] of all) {
+  for (const leaf of leaves(JSON.parse(text))) {
+    if (file.startsWith("content/pages/") && leaf.join() === "body") continue;
+    for (const put of [(was) => was + `"'><xss-probe>`, () => `"'><xss-probe>`]) {       // added to the value, which mostly stays valid, and alone
+      const data = JSON.parse(text);
+      leaf.slice(0, -1).reduce((o, key) => o[key], data)[leaf.at(-1)] = put(leaf.reduce((o, key) => o[key], data));
+      for (const preview of [false, true]) {
+        const { pages } = buildSite({ files: new Map(all).set(file, JSON.stringify(data)), hasPhoto: (name) => onDisk.has(name), preview });
+        assert.ok(![...pages.values()].some((html) => html.includes("<xss-probe>")), `${file}, ${leaf.join(".")}: this field reaches a page as HTML, so ask.site.js must check it the way it checks an extra page's body`);
+        probed += [...pages.values()].some((html) => html.includes("xss-probe"));
+      }
+    }
+  }
+}
+assert.ok(probed > 300, "the probe should reach the pages, escaped, in most fields");
+
 // Not JSON, or not an object.
 assert.notEqual(checkContent("content/site.json", '{"name": '), "");
 assert.notEqual(checkContent("content/site.json", "[]"), "");

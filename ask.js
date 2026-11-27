@@ -15,7 +15,7 @@
 import SITE from "./ask.site.js";
 
 const CFG = SITE;                         // repo, branch, and the chat and sign-in servers
-const MAX_ROUNDS = 12;                    // tool rounds per message, so a confused reply cannot loop
+const MAX_ROUNDS = 20;                    // rounds per message (tool calls, and web searches the API paused), so a confused reply cannot loop
 const MAX_PHOTOS = 8;                     // per message; Claude is sent a small copy of each
 const KEEP = SITE.store ?? "ask-" + SITE.id;   // what this page keeps in the browser is named after the site
 const STORE = KEEP + "-session";
@@ -47,7 +47,9 @@ export function checkPath(path, { reading = false, deleting = false } = {}) {
   return SITE.checkPath?.(path, { reading, deleting }) ?? "";
 }
 
-export function checkContent(path, text) {
+// `context` is for the site's own rules: {said, before}, what the person has typed in this
+// conversation and the file as it is now. It is absent when a file is only being checked as it stands.
+export function checkContent(path, text, context) {
   if (typeof text !== "string") return "The content must be text.";
   if (DESIGN && path === DESIGN) return checkCss(text);
   let data;
@@ -57,7 +59,7 @@ export function checkContent(path, text) {
     return "The content is not valid JSON: " + e.message;
   }
   if (data === null || typeof data !== "object" || Array.isArray(data)) return "The content must be a JSON object.";
-  return SITE.checkContent?.(path, data) ?? "";
+  return SITE.checkContent?.(path, data, context) ?? "";
 }
 
 // Design overrides are plain CSS that only styles what is already on the page.
@@ -112,6 +114,7 @@ const state = {
   session: null,          // {token, refreshToken} from the GitHub sign-in
   version: "",            // the chat server's prompt version this conversation started with
   messages: [],           // the conversation exactly as the API returned it; only ever appended to
+  typed: [],              // only what the person typed themselves: not notes, not files, not anything Claude read
   repo: { tree: new Map(), text: new Map() },   // the site as it is in the repo: path -> sha, path -> text
   staged: new Map(),      // path -> new text, or null for a deletion
   photos: new Map(),      // file name -> {blob, url, published}: photos added here, shown from memory
@@ -522,7 +525,9 @@ async function readFile({ path }) {
 }
 
 async function writeFile({ path, content }) {
-  const problem = checkPath(path) || checkContent(path, content);
+  // A site can insist that a value that matters (where donations go) is one the person typed, so
+  // that nothing Claude read in a file or on the web can put it there.
+  const problem = checkPath(path) || checkContent(path, content, { said: state.typed.join("\n"), before: currentText(path) });
   if (problem) throw new Error(problem);
   // A photo that was attached and then discarded, or a name that was never real, would be left
   // out of the page without a word and the dead reference published. Refuse it instead.
@@ -605,8 +610,35 @@ async function callClaude(onText, retried = false) {
   return message;
 }
 
+// A reply's words. Text either side of a web search is two separate remarks; text the API split
+// up to hang sources on is one sentence, so those pieces join with nothing between them.
+const wordsOf = (content) => content.reduce((out, block, i) => (block.type !== "text" ? out : out + (out && content[i - 1].type !== "text" ? "\n\n" : "") + block.text), "");
+
+// What Claude looked up on the web in a reply, and the pages its words rest on. These strings come
+// from the web and this page holds a sign-in, so they are only ever set as text, and only an
+// http(s) address becomes a link.
+function showWeb(content) {
+  const sources = new Map();   // address -> title
+  for (const block of content) {
+    if (block.type === "server_tool_use" && block.name === "web_search" && block.input?.query) status(`Searched the web: ${block.input.query}`);
+    if (block.type === "server_tool_use" && block.name === "web_fetch" && block.input?.url) status(`Read: ${block.input.url}`);
+    for (const cite of block.citations ?? []) if (/^https?:\/\//i.test(cite.url ?? "")) sources.set(cite.url, cite.title || cite.url);
+  }
+  if (!sources.size) return;
+  const line = status("Sources: ");
+  [...sources].forEach(([url, title], i) => {
+    const link = document.createElement("a");
+    link.href = url;
+    link.textContent = title;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    line.append(i ? ", " : "", link);
+  });
+}
+
 async function ask(text) {
   state.lastAsk = text;
+  state.typed.push(text);
   // What goes with this message: what happened to the last changes, anything pointed at, and
   // the photos. All of it lives in this new message only. Each message is appended once and never
   // edited afterwards: Claude's earlier thinking is only valid for the conversation exactly as it
@@ -648,6 +680,11 @@ async function ask(text) {
     if (message.stop_reason === "max_tokens") return notice("That answer got cut off. Try asking for one thing at a time.");
     if (!Array.isArray(message.content) || message.content.length === 0) return notice("Claude did not answer. Try asking again.");
     state.messages.push({ role: "assistant", content: message.content });
+    if (bubble.isConnected) bubble.textContent = wordsOf(message.content) || bubble.textContent;
+    showWeb(message.content);
+    // A long web search can be paused by the API part-way. Sending the conversation back exactly as
+    // it stands, with no new message from the person, makes it carry on where it stopped.
+    if (message.stop_reason === "pause_turn") continue;
     const calls = message.content.filter((block) => block.type === "tool_use");
     if (message.stop_reason !== "tool_use" || calls.length === 0) return;
     // Every tool call must get an answer, or the conversation cannot continue. If one cannot run
@@ -959,6 +996,7 @@ function explain(e) {
 
 function fresh() {
   state.messages = [];
+  state.typed = [];
   discard();
   state.chips = [];
   state.note = "";
