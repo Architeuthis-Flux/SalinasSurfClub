@@ -160,6 +160,8 @@ h3 { font-size: 1.1rem; font-weight: 800; font-stretch: 110%; line-height: 1.25;
 .member:nth-child(odd) { rotate: -1.2deg; }
 .member:nth-child(even) { rotate: 1deg; }
 .member img { width: 100%; aspect-ratio: 4 / 5; margin-bottom: 1rem; object-fit: cover; }
+.member a { display: block; text-decoration: none; }
+.member a:hover, .member a:focus-visible { text-decoration: underline; }
 .member.no-photo { padding-top: 1.4rem; border-top: 6px solid var(--green); }
 .team h2 { margin-bottom: 1.75rem; font-size: clamp(1.5rem, 3.4vw, 2.4rem); color: var(--sea); }
 .team .wrap { padding-bottom: clamp(2.5rem, 5vw, 4rem); }

@@ -48,6 +48,7 @@ collections:
       - { name: role, label: Role, widget: string, required: false, hint: 'For example "Founder" or "Volunteer surf instructor".' }
       - { name: photo, label: Photo, widget: image, required: false, hint: "A portrait works best. Shown in a white frame." }
       - { name: bio, label: About them, widget: text, required: false, hint: "A sentence or two. The page looks tidiest when everyone has one of about the same length, or nobody does." }
+      - { name: link, label: Where their name goes when clicked, widget: string, required: false, hint: 'Optional. A page of this site, like "cams.html", or a full web address. Leave empty for no link.' }
       - name: group
         label: Listed under
         widget: select

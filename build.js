@@ -150,8 +150,8 @@ function selftest() {
       "nonsense",
     ] }),
     "content/team/b-second.json": JSON.stringify({ title: "Second <i>", order: 2, role: "Volunteer", photo: "/photos/a.webp" }),
-    "content/team/a-first.json": JSON.stringify({ title: "First", order: 0, photo: "/photos/gone.jpg" }),
-    "content/team/c-chair.json": JSON.stringify({ title: "Chair", order: 5, group: "board" }),
+    "content/team/a-first.json": JSON.stringify({ title: "First", order: 0, photo: "/photos/gone.jpg", link: "javascript:alert(1)" }),
+    "content/team/c-chair.json": JSON.stringify({ title: "Chair", order: 5, group: "board", link: "cams.html" }),
     "content/team/broken.json": "{ not json",
     "content/press/old.json": JSON.stringify({ title: "Old", date: "2020-01-14", kind: "Film", url: "https://youtu.be/abcDEF_1234", outlet: "Out" }),
     "content/press/new.json": JSON.stringify({ title: "New", date: "2026-10-01", kind: "Article", url: "javascript:alert(1)", cover: "http://plain.example/x.jpg" }),
@@ -203,7 +203,7 @@ function selftest() {
   assert.ok(made.pages.get("contact.html").includes('href="mailto:a@b.org"'));         // its own file is broken; the page still stands
   assert.ok(made.pages.get("sponsors.html").includes('<img src="photos/a.webp">'));
   const cams = made.pages.get("cams.html");
-  assert.ok(index.includes('<a href="cams.html">Surf cams</a>'));
+  assert.ok(!index.includes("cams.html") && team.includes('<h3><a href="cams.html">Chair</a></h3>') && !team.includes("javascript:"));   // no link in the menu: the way in is a person's link on the team page
   assert.ok(cams.includes("Cams &lt;b&gt;") && cams.includes("North &lt;i&gt;") && cams.includes('data-map-token="tok&quot;en"'));
   assert.ok(cams.includes('data-kind="youtube" data-source="abcDEF_1234" data-lat="36.9" data-lon="-122"'));
   assert.ok(cams.includes('data-kind="hls" data-source="https://video.parks.ca.gov/A/B.stream/playlist.m3u8">'));   // a place that is not a real coordinate gets no pin

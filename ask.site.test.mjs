@@ -94,6 +94,8 @@ assert.notEqual(checkContent("content/team/x.json", '{"title": "X", "order": -1}
 assert.notEqual(checkContent("content/team/x.json", '{"title": "X", "order": "first"}'), "");
 assert.equal(checkContent("content/team/x.json", '{"title": "X", "group": "board"}'), "");
 assert.notEqual(checkContent("content/team/x.json", '{"title": "X", "group": "admins"}'), "");
+for (const link of ["cams.html", "about.html", "https://chrispowersprint.com/", ""]) assert.equal(checkContent("content/team/x.json", JSON.stringify({ title: "X", link })), "", link);
+for (const link of ["javascript:alert(1)", "/cams.html", "../admin/", "cams", "Cams.html", "cams.html#x", "//evil.example/a.html", 7]) assert.notEqual(checkContent("content/team/x.json", JSON.stringify({ title: "X", link })), "", String(link));
 assert.equal(checkContent("content/press/x.json", '{"title": "X", "url": "https://youtu.be/x", "date": "2026-10-01", "kind": "Film"}'), "");
 assert.equal(checkContent("content/press/x.json", '{"title": "X", "date": "2020"}'), "");
 assert.notEqual(checkContent("content/press/x.json", '{"title": "X", "url": "javascript:alert(1)"}'), "");

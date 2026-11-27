@@ -2,7 +2,7 @@
 // is the same on every site and comes from the friend-sites kit; do not edit those here.
 // Checked by ask.site.test.mjs (npm test).
 
-import { buildSite, camSource, donateUrl, instagramHandle, webUrl, CAM_KIND_NAMES, RESERVED } from "./render.js";
+import { buildSite, camSource, donateUrl, instagramHandle, personLink, webUrl, CAM_KIND_NAMES, RESERVED } from "./render.js";
 
 // One file per fixed page: path -> [what the "Ready to publish" list calls it, the preview page that shows it].
 const SINGLE = new Map([
@@ -68,6 +68,7 @@ function checkEntry(folder, d) {
   if (!isText(d.title)) return folder === "team" ? 'A team member needs a "title": their name.' : 'This needs a "title".';
   if (folder === "team" && !blank(d.order) && !(typeof d.order === "number" && Number.isFinite(d.order) && d.order >= 0)) return '"order" must be a number, 0 or more. Lower shows first.';
   if (folder === "team" && !blank(d.group) && !["board", "volunteers"].includes(d.group)) return '"group" must be "board" or "volunteers".';
+  if (folder === "team" && !blank(d.link) && !personLink(d.link)) return '"link" must be a page of this site, like "cams.html", or a full web address starting with https://, or empty.';
   if (folder === "press") {
     if (!blank(d.url) && !webUrl(d.url)) return '"url" must be a full web address starting with https://, or empty.';
     if (!blank(d.date) && !/^\d{4}(-\d{2}-\d{2})?$/.test(d.date)) return '"date" must look like 2026-10-01, or just the year.';

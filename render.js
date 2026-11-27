@@ -53,6 +53,13 @@ export function longDate(value) {
 
 // A link someone typed, if it is an ordinary web address. Anything else ("javascript:", a bare
 // word) comes back empty, and the page leaves the link out.
+// Where a person's name and photo go when clicked: one of this site's own pages, kept relative
+// ("cams.html"), or a full web address. Anything else gives "".
+export function personLink(value) {
+  const text = String(value ?? "").trim();
+  return /^[a-z0-9]+(-[a-z0-9]+)*\.html$/.test(text) ? text : webUrl(text);
+}
+
 export function webUrl(value) {
   try {
     const url = new URL(String(value ?? "").trim());
@@ -241,7 +248,6 @@ export function buildSite({ files, hasPhoto, photoUrl = (name) => "photos/" + na
       ["about.html", "About"],
       ...(team.length ? [["team.html", "Team"]] : []),
       ...(press.length ? [["press.html", "Press"]] : []),
-      ...(cams.length ? [["cams.html", "Surf cams"]] : []),
       ...menu,
       ["contact.html", "Contact"],
     ];
@@ -370,11 +376,14 @@ ${shot}
   };
 
   const member = (p) => {
+    // The Surf cams page has no link in the menu: the way in is the link on one person's card.
+    const go = personLink(p.link);
+    const linked = (inner) => (go && inner ? `<a href="${esc(go)}">${inner}</a>` : inner);
     const shot = photo(p.photo) ? `<img src="${photo(p.photo)}" alt="${esc(p.title)}" loading="lazy"${mark(p.path, "photo")}>` : "";
     const role = p.role ? `<p class="role"${mark(p.path, "role")}>${esc(p.role)}</p>` : "";
     return `<article class="member${shot ? "" : " no-photo"}">
-${shot}
-<h3${mark(p.path, "title")}>${esc(p.title)}</h3>
+${linked(shot)}
+<h3${mark(p.path, "title")}>${linked(esc(p.title))}</h3>
 ${role}
 <div class="bio"${mark(p.path, "bio")}>${paras(p.bio)}</div>
 </article>`;
